@@ -835,8 +835,9 @@
          */
         return function () {
             var arg = y.toArray(arguments);
+            //check of string is a event or we need to load a module
             if (y.isString(arg[0]) && !y.has(arg[0], '/')){
-                //Core.pub(p1, p2, p3, p4);
+                //MCore.pub(p1, p2, p3, p4);
             } else {
                 arg.push(Core());
                 def.apply(this, arg);
