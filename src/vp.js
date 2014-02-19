@@ -104,6 +104,25 @@
                             URI.fragment = temp[1];
                         }
                         return URI;
+                    },
+                    /**
+                     * Will only call the given function once.
+                     * After that it will return the result of this one call
+                     * @param  {Function} func
+                     * @return {Function}
+                     */
+                    once: function (func) {
+                        var test = FALSE,
+                            result;
+                        return function() {
+                            if (test) {
+                                return result;
+                            }
+                            test = TRUE;
+                            result = func.apply(this, arguments);
+                            func = null;
+                            return result;
+                        };
                     }
                 },
                 /**
@@ -308,24 +327,6 @@
                     }
                 }
                 return TRUE;
-            };
-            /**
-             * [once description]
-             * @param  {Function} func [description]
-             * @return {Function}      [description]
-             */
-            y.once = function (func) {
-                var test = FALSE,
-                    result;
-                return function() {
-                    if (test) {
-                        return result;
-                    }
-                    test = TRUE;
-                    result = func.apply(this, arguments);
-                    func = null;
-                    return result;
-                };
             };
             //return module
             return function () {
@@ -854,12 +855,12 @@
     (function(api, y){
         //async API only needed if core is loaded for that async is defined
         api.push = function() {
-            api.apply(root, y.toArray(arguments));
+            api.apply(root, arguments);
         };
         //execute async calls
         if (y.isFunction(async)) {
             y.each(async(), function(call){
-                api.apply(root, y.toArray(call));
+                api.apply(root, call);
             });
         }
     }(root[ns], Y()));
