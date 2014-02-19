@@ -309,6 +309,24 @@
                 }
                 return TRUE;
             };
+            /**
+             * [once description]
+             * @param  {Function} func [description]
+             * @return {Function}      [description]
+             */
+            y.once = function (func) {
+                var test = FALSE,
+                    result;
+                return function() {
+                    if (test) {
+                        return result;
+                    }
+                    test = TRUE;
+                    result = func.apply(this, arguments);
+                    func = null;
+                    return result;
+                };
+            };
             //return module
             return function () {
                 return y;
@@ -334,7 +352,7 @@
                     pub: function (evnt, data, scope, notAsync) {
                         var evntPart = '',
                             subs = [],
-                            originEvent;
+                            originEvent = evnt;
                         //is event valid
                         if (validPublish.test(evnt)) {
                             //subscriber with id
@@ -342,14 +360,15 @@
                                 subs = subs.concat(subscribers[evnt]);
                             }
                             //remove event
-                            evnt = originEvent = evnt.split('@')[0];
+                            evnt = evnt.split('@')[0];
                             //subscriber without id 
-                            if (subscribers[evnt]) {
+                            if (evnt !== originEvent && subscribers[evnt]) {
                                 subs = subs.concat(subscribers[evnt]);
                             }
                             //wild card
                             evnt = evnt.split('.');
-                            for (var i = 0, max = evnt.length - 1; i < max; i++) {
+                            evntPart = evnt[0];
+                            for (var i = 1, max = evnt.length - 1; i < max; i++) {
                                 evntPart += '.' + evnt[i];
                                 if(subscribers[evntPart + '.*']) {
                                     subs = subs.concat(subscribers[evntPart]);
@@ -357,7 +376,7 @@
                             }
                             //all
                             if (subscribers['*']) {
-                                subs = subs.concat(subscribers['*:']);
+                                subs = subs.concat(subscribers['*']);
                             }
                             //start publishing
                             y.each(subs, function(subscriber){
@@ -637,9 +656,9 @@
             }
             /**
              * get dependencies from module requested
-             * @param  {String} deps a array of dependencies for the current module
-             * @param  {[type]} id   the ID of the current module
-             * @return {Boolean}     returns true if module needs dependencies else false.
+             * @param  {Array}      deps    a array of dependencies for the current module
+             * @param  {String}     id      the ID of the current module
+             * @return {Boolean}            returns true if module needs dependencies else false.
              */
             function getDependencies (deps, id) {
                 var needed = [],
@@ -691,7 +710,7 @@
              * @param  {Object}     scope   [description]
              */
             function registerModule(id, deps, factory , conf, scope) {
-                id = parseId(id).id;
+                var id = parseId(id).id;
                 if (loaded[id]) {
                     return; //error module already registered
                 }
@@ -706,8 +725,8 @@
                 loaded[id] = {
                     deps: deps,
                     factory: factory,
-                    conf: conf,
-                    scope: scope,
+                    conf: conf || 0,
+                    scope: scope || root,
                     init: FALSE
                 };
                 //clean
@@ -746,15 +765,15 @@
             //return the module
             return function () {
                 return {
-                    def: function (id, deps) {
+                    def: function () {
                         var arg = y.toArray(arguments);
                         //if ID is a string we want to register a module
-                        if (y.isString(id)) {
+                        if (y.isString(arg[0])) {
                             //check dependencies
-                            if (y.isArray(deps) && getDependencies(deps, id)) {
+                            if (y.isArray(arg[1]) && getDependencies(arg[1], arg[0])) {
                                 //subscribe and wait when all modules are loaded
                                 subscribe(evntModule + 'loaded', function() {
-                                    if(!getDependencies(deps)) {
+                                    if(!getDependencies(arg[1])) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
                                         registerModule.apply(null, arg);
@@ -766,16 +785,15 @@
                             }
                         }
                         //load module with dependencies
-                        if (y.isArray(id)) {
+                        if (y.isArray(arg[0])) {
                             //check of we need to wait on dependencies
-                            if (getDependencies(id)) {
+                            if (getDependencies(arg[0])) {
                                 //subscribe and wait when all modules are loaded
                                 subscribe(evntModule + 'loaded', function() {
-                                    console.log('loaded>>>', arguments );
-                                    if(!getDependencies(id)) {
+                                    if(!getDependencies(arg[0])) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
-                                        loadModule.apply(null, arg);
+                                        loadModule.apply(this, arg);
                                     }
                                 });
                             } else {
@@ -783,7 +801,7 @@
                             }
                         }
                         //load module without dependencies
-                        if (y.isFunction(id)) {
+                        if (y.isFunction(arg[0])) {
                             loadModule.apply(null, arg);
                         }
                     }
@@ -805,22 +823,22 @@
          * @param  {Function} p3 [description]
          * @return {[type]}    [description]
          */
-        root.define = function (p1, p2, p3) {
-            def(p1, p2, p3, null, root);
-        };
+        root.define = def;
         /**
          * [description]
-         * @param  {String|Array|Function} p1
-         * @param  {Object|Array|Function} p2 [description]
-         * @param  {Object|Function} p3 [description]
-         * @param  {Number} p4 [description]
-         * @return {vpjs} [description]
+         * @param  {String|Array|Function}  p1
+         * @param  {Object|Array|Function}  p2 [description]
+         * @param  {Object|Function}        p3 [description]
+         * @param  {Number}                 p4 [description]
+         * @return {vpjs}                   [description]
          */
-        return function (p1, p2 , p3, p4) {
-            if (y.isString(p1) && !y.has(p1, '/')){
+        return function () {
+            var arg = y.toArray(arguments);
+            if (y.isString(arg[0]) && !y.has(arg[0], '/')){
                 //Core.pub(p1, p2, p3, p4);
             } else {
-                def(p1, p2, p3, p4, Core());
+                arg.push(Core());
+                def.apply(this, arg);
             }
         };
     }(Y(), AMD(), Core()));
