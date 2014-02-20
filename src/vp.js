@@ -711,7 +711,7 @@
              * @param  {Object}     scope   [description]
              */
             function registerModule(id, deps, factory , conf, scope) {
-                var id = parseId(id).id;
+                id = parseId(id).id;
                 if (loaded[id]) {
                     return; //error module already registered
                 }
@@ -824,7 +824,11 @@
          * @param  {Function} p3 [description]
          * @return {[type]}    [description]
          */
-        root.define = def;
+        if (!root.define) {
+            root.define = function (p1,p2,p3) {
+                def.call(root, p1, p2, p3);
+            };
+        }
         /**
          * [description]
          * @param  {String|Array|Function}  p1
@@ -833,12 +837,52 @@
          * @param  {Number}                 p4 [description]
          * @return {vpjs}                   [description]
          */
-        return function () {
-            var arg = y.toArray(arguments);
+        return function (p1, p2, p3) {
+            var arg = y.toArray(arguments),
+                prefix = /^(<|>)(.*)/.exec(p1);
+            /**
+             * Subscribe once and publish in the same time.
+             * Use this only with  Message broker rules
+             */
+            function subpub () {
+                var evnt = p1,
+                    data = p2,
+                    subscriber = p3,
+                    scope = p3,
+                    id = +new Date();
+                //add id if need
+                if (!y.has(evnt, '@')) {
+                    evnt += '@' + id;
+                }
+                //add subscriber
+                if (y.isFunction(subscriber)) {
+                    MCore.sub(evnt, function () {
+                        MCore.unsub(evnt, this.subscriber);
+                        subscriber.apply(this, arguments);
+                    }, scope);
+                }
+                //publish
+                MCore.pub(evnt, data, scope);
+            }
             //check of string is a event or we need to load a module
-            if (y.isString(arg[0]) && !y.has(arg[0], '/')){
-                //MCore.pub(p1, p2, p3, p4);
+            if (prefix || y.isString(arg[0]) && !y.has(arg[0], '/')){
+                if (prefix) {
+                    //subscribe only
+                    switch (prefix[1]) {
+                        //subscribe only
+                        case '<':
+                            MCore.sub(prefix[2], p2, p3, Core());
+                            break;
+                        //publish only
+                        case '>':
+                            MCore.pub(prefix[2], p2, p3);
+                            break;
+                    }
+                } else {
+                    subpub();
+                }
             } else {
+                arg.slice(0,4); //if some try to change the scope
                 arg.push(Core());
                 def.apply(this, arg);
             }
