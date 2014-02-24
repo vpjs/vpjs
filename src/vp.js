@@ -11,6 +11,8 @@
         FALSE = false,
         NULL = null,
         async = root[ns],
+        win = window,
+        doc = win.document,
         /**
          * Y module
          * @return {Object} Y module
@@ -500,14 +502,81 @@
             };
         }(Events(), Y())),
         /**
+         * Queue module
+         * @param  {Y}
+         * @return {Queue}
+         */
+        Queue = (function(y){
+            return function () {
+                var queue = [],
+                    running = FALSE,
+                    paused = FALSE,
+                    api;
+                function next () {
+                    var item;
+                    //queue paused?
+                    if (!paused) {
+                        item = queue.shift();
+                        if (item) {
+                            running = TRUE;
+                            item[0].apply(item[3], item[1]);
+                            next();
+                        } else {
+                            running = FALSE;
+                        }
+                    }
+                }
+                return (api = {
+                    /**
+                     * Push a call in the queue
+                     * @param  {Function}   call    call that you want to push
+                     * @param  {Array}      arg     array of arguments that have to be send to the call if it's called
+                     * @param  {Number}     opt     bitwise options
+                     * @param  {Object}     thisArg
+                     * @return {Queue}
+                     */
+                    push: function (call, arg, opt, thisArg) {
+                        queue.push([call, arg || [], opt, thisArg]);
+                        if (!paused && !running) {
+                            next();
+                        }
+                        return api;
+                    },
+                    /**
+                     * Next item in the queue
+                     */
+                    next: next,
+                    /**
+                     * Pause the the queue
+                     * @param  {Boolean}    [state] true for pause, false for unpause if not set it will toggle the current pause state
+                     */
+                    pause: function (state) {
+                        if (y.isBool(state)) {
+                            paused = state;
+                        } else {
+                            paused = !paused;
+                        }
+                        if (!paused && !running) {
+                            next();
+                        }
+                    }
+                });
+            };
+        }(Y())),
+        /**
          * Import script, CSS
          * @param  {Y}          Y module
          * @return {Import}     Import module
          */
-        Import = (function(y){
-            var doc = document,
-                head = doc.head || doc.getElementsByTagName('head')[0] || NULL,
+        Import = (function(y, MQueue, MCore){
+            var head = doc.head || doc.getElementsByTagName('head')[0] || NULL,
                 body = doc.body || doc.getElementsByTagName('body')[0];
+            //pause queue
+            MQueue.pause();
+            MCore.sub('!'+ ns +'.ready', function () {
+                MQueue.pause(false);
+                MCore.unsub('!'+ ns +'.ready', this.subscriber);
+            });
             //load script
             function script (url, callback) {
                 var tag = doc.createElement('script'),
@@ -517,7 +586,7 @@
                 tag.src = url;
                 tag.async = TRUE;
                 if (y.isFunction(callback)) {
-                    callback = y.once(callback); //for that callback only is called once
+                    callback = y.once(callback); //call callback only once
                     tag.onreadystatechange = tag.onload = function () {
                         var state = tag.readyState;
                         if (!state || /loaded|complete/.test(state)) {
@@ -535,10 +604,12 @@
                      * @param  {String}     url      script url
                      * @param  {Function}   callback callback if script is loaded
                      */
-                    script: script
+                    script: function () {
+                        MQueue.push(script, arguments, 0, this);
+                    }
                 };
             };
-        }(Y())),
+        }(Y(), Queue(), Core())),
         /**
          * AMD module
          * @return {Function} AMD module
@@ -574,11 +645,11 @@
                 publish = MCore.pub,
                 subscribe = MCore.sub,
                 unsubscribe = MCore.unsub,
-                evntModule = 'core.amd.module.',
+                evntModule = ns + '.amd.',
                 config = y.merge({
                     baseUrl: './',
                     paths: {}
-                }, MCore.get('core.amd.config'), true);
+                }, MCore.get('$/amd'), true);
             /**
              * Will parse the module ID based on the AMD standard
              * @see https://github.com/amdjs/amdjs-api/wiki/AMD#module-id-format-
@@ -909,4 +980,61 @@
             });
         }
     }(root[ns], Y()));
+    /**
+     * Cross browser DOM ready
+     * Will publish 'dom.ready' if DOM content is loaded.
+     * @param  {Events.pub} publish [description]
+     * @param  {Y.once}     once    [description]
+     */
+    (function (publish, once) {
+        var isFrame,
+            //onready
+            ready = once(function () {
+                //publish event
+                publish(ns + '.ready');
+            }),
+            //try scroll for IE
+            tryScroll = function () {
+                try {
+                    doc.documentElement.doScroll('left');
+                    ready();
+                } catch (e) {
+                    setTimeout(tryScroll, 10);
+                }
+            };
+        //check of DOM is already ready
+        if (doc.readyState === 'complete' || doc.body) {
+            return ready();
+        }
+        // Real browsers
+        if (doc.addEventListener) {
+            doc.addEventListener('DOMContentLoaded', ready, FALSE);
+        // a lot of code for 1 single browser a.k.a IE
+        } else if (doc.attachEvent) {
+            //check iFrame
+            try {
+                isFrame = win.frameElement !== NULL;
+            } catch (e) {}
+            // if not in a iframe
+            if (!isFrame && doc.documentElement.doScroll) {
+                tryScroll();
+            }
+            // iFrame needs different code :|
+            doc.attachEvent('onreadystatechange', function () {
+                if (doc.readyState === 'complete') {
+                    ready();
+                }
+            });
+        } else {
+            // browsers of the year 0
+            if (win.addEventListener) {
+                win.addEventListener('load', ready, FALSE);
+            } else if (win.attachEvent) {
+                win.attachEvent('onload', ready);
+            } else {
+                // browsers B.C.
+                win.onload = ready;
+            }
+        }
+    }(Core().pub, Y().once));
 }(this, this.__VPJSNS__ || 'vpjs', this.__VPJSBOOTSTRAP__ || []));
