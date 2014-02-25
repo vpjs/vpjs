@@ -1,13 +1,18 @@
 /**
- * [description]
- * @param  {[type]} root      [description]
- * @param  {[type]} ns        [description]
- * @param  {[type]} bootstrap [description]
- * @return {[type]}           [description]
+ * VPJS core
+ * IMPORTANT this project is still in draft.
+ * @author Victor Perez
+ * @param  {Object} [root=this] Library root scope
+ * @param  {String} [ns=vpjs]   You can change the namespace via __VPJSNS__, all core events will start with you defined namespace and not with vpjs
+ * @param  {Array}  bootstrap   You can define the bootstrap via __VPJSBOOTSTRAP__, this must be array of functions.
+ *                              Important, the bootstrap must be defined before loading the library!
  */
 (function (root, ns, bootstrap) {
     'use strict';
-    var TRUE = true,
+    var VERSION = '0.0.1',
+        GIT_VERSION = '',
+        //minimize true, false, null
+        TRUE = true,
         FALSE = false,
         NULL = null,
         async = root[ns],
@@ -17,7 +22,7 @@
          * Y module
          * @return {Object} Y module
          */
-        Y = (function(){
+        Y = (function () {
             var proArr = Array.prototype,
                 proObj = Object.prototype,
                 nForEach = proArr.forEach,
@@ -31,7 +36,7 @@
                     * @return {Boolean}
                     */
                     isObject: function (obj, literal) {
-                        return Object(obj) === obj && (!literal || obj.constructor === Object);
+                        return proObj.constructor(obj) === obj && (!literal || obj.constructor === Object);
                     },
                     /**
                     * Is a given value a regular expression?
@@ -59,22 +64,26 @@
                             origin,
                             temp;
                         //scheme, only file can have ///
-                        if(temp = /^([^:]+):\/\/[^\/]|(file):\/\/\/?/.exec(str)) { // jshint ignore:line
+                        temp = /^([^:]+):\/\/[^\/]|(file):\/\/\/?/.exec(str);
+                        if (temp) {
                             origin += URI.scheme = (temp[1] || temp[2]).toLowerCase();
                         }
                         //file can't have, host, port, user or pass
                         if (URI.scheme !== 'file') {
                             //[scheme]://(domain) or //(host) or host[:port]  or [user]:[pass]@(host)
-                            if (temp = /^([^:]+:)?\/\/([^@]+@)?([^:\/]+)/.exec(str) || /^[^@\/]+@([^:\/]+)/.exec(str) || /^([:\/]+):[1-9][0-9]*/.exec(str)) { // jshint ignore:line
+                            temp = /^([^:]+:)?\/\/([^@]+@)?([^:\/]+)/.exec(str) || /^[^@\/]+@([^:\/]+)/.exec(str) || /^([:\/]+):[1-9][0-9]*/.exec(str);
+                            if (temp) {
                                 origin += URI.host = (temp[2] || temp[1]).toLowerCase();
                             }
                             //port
-                            if (temp = /^(([^:]+:)?\/\/)?[^\/]+:([1-9][0-9]*)/.exec(str)) { // jshint ignore:line
-                                origin += ':' +temp[3];
+                            temp = /^(([^:]+:)?\/\/)?[^\/]+:([1-9][0-9]*)/.exec(str);
+                            if (temp) {
                                 URI.port = +temp[3];
+                                origin += ':' + URI.port;
                             }
                             //user & pass
-                            if (temp = /^(([^:]+:)?\/\/)?([^\/@]+)@/.exec(str)) { // jshint ignore:line
+                            temp = /^(([^:]+:)?\/\/)?([^\/@]+)@/.exec(str);
+                            if (temp) {
                                 origin = temp[3] + '@' + origin;
                                 temp = temp[3].split(':');
                                 if (temp.length > 1) {
@@ -88,7 +97,9 @@
                             str = str.substr(origin.length);
                             URI.origin = origin;
                         }
-                        if (temp = /([^?#]+)/.exec(str)) { // jshint ignore:line
+                        //path, dir and file
+                        temp = /([^?#]+)/.exec(str);
+                        if (temp) {
                             URI.path = temp = temp[1];
                             temp = temp.split('/');
                             if (temp[temp.length - 1] !== '') {
@@ -98,11 +109,13 @@
                             URI.dir = temp.join('/');
                         }
                         //query
-                        if (temp = /[^#?]*\?([^#]*)/.exec(str)) { // jshint ignore:line
+                        temp = /[^#?]*\?([^#]*)/.exec(str);
+                        if (temp) {
                             URI.query = temp[1];
                         }
                         //fragment
-                        if (temp = /#(.*)/.exec()) { // jshint ignore:line
+                        temp = /#(.*)/.exec();
+                        if (temp) {
                             URI.fragment = temp[1];
                         }
                         return URI;
@@ -116,7 +129,7 @@
                     once: function (func) {
                         var test = FALSE,
                             result;
-                        return function() {
+                        return function () {
                             if (test) {
                                 return result;
                             }
@@ -148,19 +161,18 @@
                  * Is object an Arguments object
                  * @return {Boolean}
                  */
-                isArguments = y.isArguments = (function(){
-                    function test (obj) {
+                isArguments = y.isArguments = (function () {
+                    function test(obj) {
                         return toString.call(obj) === '[object Arguments]';
                     }
                     //test will not correct work in IE
-                    if(test(arguments)) {
+                    if (test(arguments)) {
                         return test;
-                    } else {
-                        //fall back for IE;
-                        return function (obj) {
-                            return !!(obj && hasop(obj, 'callee'));
-                        };
                     }
+                    //fall back for IE;
+                    return function (obj) {
+                        return !!(obj && hasop(obj, 'callee'));
+                    };
                 }()),
                 /**
                  * Will loop trough Array's, Arguments and Objects
@@ -173,7 +185,7 @@
                     if (obj === null) {
                         return;
                     }
-                    //array with native support 
+                    //array with native support
                     if (obj.forEach === nForEach) {
                         obj.forEach(iterator, context);
                     //Array and Arguments
@@ -184,7 +196,7 @@
                     //Objects
                     } else {
                         for (var x in obj) {
-                            if(hasop(x, obj)) {
+                            if (hasop(x, obj)) {
                                 iterator.call(context, obj[x], x, obj);
                             }
                         }
@@ -196,7 +208,7 @@
              * @param  {Object} obj
              * @return {Boolean}
              */
-            each(['Function', 'String', 'Number', 'Date'], function(is) {
+            each(['Function', 'String', 'Number', 'Date'], function (is) {
                 y['is' + is] = function (obj) {
                     return toString.call(obj) === '[object ' + is + ']';
                 };
@@ -246,7 +258,7 @@
                 }
                 //Object to Array
                 if (y.isObject(iterable)) {
-                    each(iterable, function(value) {
+                    each(iterable, function (value) {
                         temp.push(value);
                     });
                     return temp;
@@ -269,7 +281,7 @@
                 }
                 //array
                 if (isArray(obj1)) {
-                    each(arg, function(arr){
+                    each(arg, function (arr) {
                         obj1 = obj1.concat(y.toArray(arr));
                     });
                     return obj1;
@@ -281,7 +293,7 @@
                         if (!y.isObject(obj)) {
                             obj = {};
                         }
-                        each(obj, function(value, key) {
+                        each(obj, function (value, key) {
                             //deep
                             if (deep && y.isObject(obj1[key])) {
                                 y.merge(obj1[key], value, true);
@@ -299,8 +311,8 @@
             /**
              * Is a given object empty?
              * undefined, null, false, 0, "0"
-             * @param  {[type]} obj [description]
-             * @return {[type]}     [description]
+             * @param  {Object}     obj Object that you want to check
+             * @return {Boolean}        if empty true
              */
             y.empty = function (obj) {
                 var str;
@@ -313,7 +325,7 @@
                     return obj.length === 0;
                 }
                 //shouldn't happen but if someone used new [Type]
-                str = ''+obj; //to string
+                str = '' + obj; //to string
                 //new String and new Number
                 if (y.isString(obj) && y.isNumber(obj)) {
                     return str === '' || str === '0';
@@ -337,9 +349,9 @@
         }()),
         /**
          * Events module
-         * @return {[type]} [description]
+         * @return {Events}
          */
-        Events = (function(y){
+        Events = (function (y) {
             var validSubscribe = /^!?(\*$|[a-z]+)([a-z0-9]*\.([a-z0-9]+|\*$))*(@[0-9]+)?$/,
                 validPublish = /^[a-z]+([a-z0-9]*\.[a-z0-9]+)*(@[0-9]+)?$/;
             return function () {
@@ -373,7 +385,7 @@
                             evntPart = evnt[0];
                             for (var i = 1, max = evnt.length - 1; i < max; i++) {
                                 evntPart += '.' + evnt[i];
-                                if(subscribers[evntPart + '.*']) {
+                                if (subscribers[evntPart + '.*']) {
                                     subs = subs.concat(subscribers[evntPart]);
                                 }
                             }
@@ -382,12 +394,12 @@
                                 subs = subs.concat(subscribers['*']);
                             }
                             //start publishing
-                            y.each(subs, function(subscriber){
+                            y.each(subs, function (subscriber) {
                                 if (!subscribers[1] || subscriber[1] === scope) {
                                     if (notAsync) {
                                         subscriber[0](data, originEvent);
                                     } else {
-                                        setTimeout(function(){
+                                        setTimeout(function () {
                                             subscriber[0](data, originEvent);
                                         }, 5);
                                     }
@@ -419,9 +431,9 @@
                         //loop though all events
                         for (var i = 0, max = allEvnt.length; i < max; i++) {
                             parseEvnt = allEvnt[i];
-                            if(validSubscribe.test(allEvnt[i])) {
+                            if (validSubscribe.test(allEvnt[i])) {
                                 //TODO
-                                if (parseEvnt.slice(0,1) === '!') {
+                                if (parseEvnt.slice(0, 1) === '!') {
                                     parseEvnt = parseEvnt.slice(1);
                                 }
                                 //add subscriber list
@@ -448,9 +460,9 @@
                      * @param  {[type]} scope      the scope if used by subscribing
                      */
                     unsub: function (evnt, subscriber, scope) {
-                        y.each(subscribers[evnt], function(sub, i){
+                        y.each(subscribers[evnt], function (sub, i) {
                             if (sub[2] === subscriber && (!sub[1] || sub[1] === scope)) {
-                                subscribers[evnt].splice(i,1);
+                                subscribers[evnt].splice(i, 1);
                             }
                         });
                     }
@@ -462,15 +474,17 @@
          * @param  {[type]} Events [description]
          * @return {[type]}        [description]
          */
-        Core = (function(Events, y){
+        Core = (function (Events, y) {
             var config = {};
             return function () {
                 return {
+                    VERSION: VERSION,
+                    GIT_VERSION: GIT_VERSION,
                     pub: Events.pub,
                     sub: Events.sub,
                     unsub: Events.unsub,
                     get: function (key) {
-                        if(config[key]) {
+                        if (config[key]) {
                             return config[key].d;
                         }
                         return null;
@@ -506,13 +520,13 @@
          * @param  {Y}
          * @return {Queue}
          */
-        Queue = (function(y){
+        Queue = (function (y) {
             return function () {
                 var queue = [],
                     running = FALSE,
                     paused = FALSE,
                     api;
-                function next () {
+                function next() {
                     var item;
                     //queue paused?
                     if (!paused) {
@@ -568,17 +582,17 @@
          * @param  {Y}          Y module
          * @return {Import}     Import module
          */
-        Import = (function(y, MQueue, MCore){
+        Import = (function (y, MQueue, MCore) {
             var head = doc.head || doc.getElementsByTagName('head')[0] || NULL,
                 body = doc.body || doc.getElementsByTagName('body')[0];
             //pause queue
             MQueue.pause();
-            MCore.sub('!'+ ns +'.ready', function () {
+            MCore.sub('!' + ns + '.ready', function () {
                 MQueue.pause(false);
-                MCore.unsub('!'+ ns +'.ready', this.subscriber);
+                MCore.unsub('!' + ns + '.ready', this.subscriber);
             });
             //load script
-            function script (url, callback) {
+            function script(url, callback) {
                 var tag = doc.createElement('script'),
                     insertInto = head || body;
                 //script tag
@@ -614,30 +628,40 @@
          * AMD module
          * @return {Function} AMD module
          */
-        AMD = (function(y, MCore, MImport){
-            var loaded = {
+        AMD = (function (y, MCore, MImport) {
+            var REFACTOR = 1,
+                loaded = {
                     '$/y' : {
-                        init: true,
+                        init: TRUE,
                         factory: Y()
                     },
                     '$/events': {
-                        init: true,
-                        factory: Events()
+                        init: FALSE,
+                        factory: Events,
+                        conf: REFACTOR
                     },
                     '$/import': {
-                        init: true,
-                        factory: Import()
+                        init: FALSE,
+                        factory: Import,
+                        conf: REFACTOR
                     },
                     '$/core': {
-                        init: true,
-                        factory: Core()
+                        init: FALSE,
+                        factory: Core,
+                        conf: REFACTOR
+                    },
+                    '$/queue': {
+                        init: FALSE,
+                        factory: Queue,
+                        conf: REFACTOR
                     },
                     '$/amd': {
-                        init: false,
+                        init: FALSE,
                         factory: function () {
                             return AMD();
                         },
-                        deps: []
+                        deps: [],
+                        conf: REFACTOR
                     }
                 },
                 requested = {},
@@ -658,7 +682,7 @@
              * @param  {String} basePath Will be used to find the correct dependencies path
              * @return {Object}          {id: 'ns/moduleA', loadUrl: 'http://example.com/ns/moduleA.js'}
              */
-            function parseId (id, basePath) {
+            function parseId(id, basePath) {
                 var extendsion = id.slice(-3) === '.js' ? '' : '.js',
                     idPath, URI, URIbase, relative;
                 //reserved for core modules
@@ -681,11 +705,11 @@
                 URIbase = y.parseURI(basePath || config.baseUrl);
                 basePath = URIbase.path;
                 // ./ns/module => ns/module
-                if(idPath.slice(0,2) === './') {
+                if (idPath.slice(0, 2) === './') {
                     idPath =  idPath.slice(2);
                 }
                 //check path ( can't use path with ../)
-                relative = idPath.slice(0,3) !== '../';
+                relative = idPath.slice(0, 3) !== '../';
                 if (!relative) {
                     idPath = idPath.split('/');
                     if (idPath.length > 1 && config.paths[idPath[0]]) {
@@ -694,7 +718,7 @@
                     idPath = idPath.join('/');
                 }
                 //if relative is false, we need to recheck because a path can be also relative
-                if  (relative || idPath.slice(0,3) !== '../') {
+                if  (relative || idPath.slice(0, 3) !== '../') {
                     idPath = idPath.split('/');
                     basePath = basePath.split('/');
                     while (true) {
@@ -732,7 +756,7 @@
              * @param  {String}     id      the ID of the current module
              * @return {Boolean}            returns true if module needs dependencies else false.
              */
-            function getDependencies (deps, id) {
+            function getDependencies(deps, id) {
                 var needed = [],
                     wait = FALSE;
                 //get ID if ID is defined, else set ID ( parse ID will than use the baseURL )
@@ -781,7 +805,7 @@
              * @param  {Number}     conf    [description]
              * @param  {Object}     scope   [description]
              */
-            function registerModule(id, deps, factory , conf, scope) {
+            function registerModule(id, deps, factory, conf, scope) {
                 id = parseId(id).id;
                 if (loaded[id]) {
                     return; //error module already registered
@@ -789,7 +813,7 @@
                 //curry
                 if (y.isFunction(deps)) {
                     scope = conf;
-                    conf = factory ;
+                    conf = factory;
                     factory = deps;
                     deps = [];
                 }
@@ -814,7 +838,7 @@
              * @param  {Object}     scope       module scope
              * @return {Objec}                  the result of the factory
              */
-            function loadModule (deps, factory, conf, scope) {
+            function loadModule(deps, factory, conf, scope) {
                 //curry
                 if (y.isFunction(deps)) {
                     scope = conf;
@@ -823,11 +847,14 @@
                     deps = [];
                 }
                 //load deps
-                y.each(deps, function(id, i) {
+                y.each(deps, function (id, i) {
                     var module = loaded[parseId(id).id];
                     if (!module.init) {
                         module.factory = loadModule(module.deps, module.factory, module.conf, module.scope);
-                        module.init = TRUE;
+                        //check REFACTOR bit
+                        if (module.conf & ~REFACTOR) {
+                            module.init = TRUE;
+                        }
                     }
                     deps[i] = module.factory;
                 });
@@ -837,6 +864,12 @@
             //return the module
             return function () {
                 return {
+                    /**
+                     * REFACTOR bit [1]
+                     * Will re-factor every time when the module is request.
+                     * @type {Integer}
+                     */
+                    REFACTOR: REFACTOR,
                     def: function () {
                         var arg = y.toArray(arguments);
                         //if ID is a string we want to register a module
@@ -844,8 +877,8 @@
                             //check dependencies
                             if (y.isArray(arg[1]) && getDependencies(arg[1], arg[0])) {
                                 //subscribe and wait when all modules are loaded
-                                subscribe(evntModule + 'loaded', function() {
-                                    if(!getDependencies(arg[1])) {
+                                subscribe(evntModule + 'loaded', function () {
+                                    if (!getDependencies(arg[1])) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
                                         registerModule.apply(null, arg);
@@ -861,8 +894,8 @@
                             //check of we need to wait on dependencies
                             if (getDependencies(arg[0])) {
                                 //subscribe and wait when all modules are loaded
-                                subscribe(evntModule + 'loaded', function() {
-                                    if(!getDependencies(arg[0])) {
+                                subscribe(evntModule + 'loaded', function () {
+                                    if (!getDependencies(arg[0])) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
                                         loadModule.apply(this, arg);
@@ -886,7 +919,7 @@
      * @param {AMD}     AMD     [description]
      * @param {Core}    MCore   [description]
      */
-    root[ns] = (function(y, AMD, MCore){
+    root[ns] = (function (y, AMD, MCore) {
         var def = AMD.def;
         /**
          * AMD module loading via define
@@ -896,7 +929,7 @@
          * @return {[type]}    [description]
          */
         if (!root.define) {
-            root.define = function (p1,p2,p3) {
+            root.define = function (p1, p2, p3) {
                 def.call(root, p1, p2, p3);
             };
         }
@@ -915,7 +948,7 @@
              * Subscribe once and publish in the same time.
              * Use this only with  Message broker rules
              */
-            function subpub () {
+            function subpub() {
                 var evnt = p1,
                     data = p2,
                     subscriber = p3,
@@ -936,7 +969,7 @@
                 MCore.pub(evnt, data, scope);
             }
             //check of string is a event or we need to load a module
-            if (prefix || y.isString(arg[0]) && !y.has(arg[0], '/')){
+            if (prefix || y.isString(arg[0]) && !y.has(arg[0], '/')) {
                 if (prefix) {
                     //subscribe only
                     switch (prefix[1]) {
@@ -953,36 +986,39 @@
                     subpub();
                 }
             } else {
-                arg.slice(0,4); //if some try to change the scope
+                arg.slice(0, 4); //if some try to change the scope
                 arg.push(Core());
                 def.apply(this, arg);
             }
         };
     }(Y(), AMD(), Core()));
     //bootstrap
-    (function(y){
+    (function (y) {
         if (y.isArray(bootstrap)) {
-            y.each(bootstrap, function(elm){
-                elm();
+            y.each(bootstrap, function (elm) {
+                //check of bootstrap elm is a function 
+                if (y.isFunction(elm)) {
+                    elm();
+                }
             });
         }
     }(Y()));
     //async
-    (function(api, y){
+    (function (api, y) {
         //async API only needed if core is loaded for that async is defined
-        api.push = function() {
+        api.push = function () {
             api.apply(root, arguments);
         };
         //execute async calls
         if (y.isFunction(async)) {
-            y.each(async(), function(call){
+            y.each(async(), function (call) {
                 api.apply(root, call);
             });
         }
     }(root[ns], Y()));
     /**
      * Cross browser DOM ready
-     * Will publish 'dom.ready' if DOM content is loaded.
+     * Will publish ns + '.ready' if DOM content is loaded.
      * @param  {Events.pub} publish [description]
      * @param  {Y.once}     once    [description]
      */
@@ -991,7 +1027,7 @@
             //onready
             ready = once(function () {
                 //publish event
-                publish(ns + '.ready');
+                publish(ns + '.ready', [VERSION, GIT_VERSION]);
             }),
             //try scroll for IE
             tryScroll = function () {
@@ -1032,7 +1068,7 @@
             } else if (win.attachEvent) {
                 win.attachEvent('onload', ready);
             } else {
-                // browsers B.C.
+                // browsers of B.C.
                 win.onload = ready;
             }
         }
