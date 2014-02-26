@@ -47,12 +47,28 @@
                         return obj && (obj.ignoreCase || obj.ignoreCase === FALSE) && obj.test && obj.exec;
                     },
                     /**
+                     * Is given value undefined?
+                     * @param  {Objec}      obj [description]
+                     * @return {Boolean}        [description]
+                     */
+                    isUndefined: function (obj) {
+                        return obj === void 0;
+                    },
+                    /**
                     * Is a given value a boolean?
                     * @param {Object}
                     * @return {Boolean}
                     */
                     isBool: function (obj) {
                         return obj === TRUE || obj === FALSE || toString.call(obj) === '[object Boolean]';
+                    },
+                    /**
+                    * Is a given value a DOM element?
+                    * @param {Object}
+                    * @return {Boolean}
+                    */
+                    isElement: function (obj) {
+                        return !!(obj && obj.nodeType === 1);
                     },
                     /**
                      * Parse a URI and return its components
@@ -182,7 +198,7 @@
                  */
                 each = y.each = function (obj, iterator, context) {
                     //null we can't interate that
-                    if (obj === null) {
+                    if (obj === null || y.isUndefined(obj)) {
                         return;
                     }
                     //array with native support
@@ -196,7 +212,7 @@
                     //Objects
                     } else {
                         for (var x in obj) {
-                            if (hasop(x, obj)) {
+                            if (hasop(obj, x)) {
                                 iterator.call(context, obj[x], x, obj);
                             }
                         }
@@ -615,11 +631,20 @@
                 return {
                     /**
                      * Load a script async
-                     * @param  {String}     url      script url
+                     * @param  {String|Array}     url      script url
                      * @param  {Function}   callback callback if script is loaded
                      */
-                    script: function () {
-                        MQueue.push(script, arguments, 0, this);
+                    script: function (urls, callback) {
+                        //if urls is a array of urls
+                        if (y.isArray(urls)) {
+                            y.each(urls, function (url) {
+                                MQueue.push(script, [url, callback]);
+                            });
+                        }
+                        //single url
+                        if (y.isString(urls)) {
+                            MQueue.push(script, [urls, callback]);
+                        }
                     }
                 };
             };
@@ -670,21 +695,31 @@
                 subscribe = MCore.sub,
                 unsubscribe = MCore.unsub,
                 evntModule = ns + '.amd.',
-                config = y.merge({
+                //default config
+                config = {
                     baseUrl: './',
+                    cache: true,
                     paths: {}
-                }, MCore.get('$/amd'), true);
+                };
             /**
              * Will parse the module ID based on the AMD standard
              * @see https://github.com/amdjs/amdjs-api/wiki/AMD#module-id-format-
              * Beside that it support some requireJS ID's
+             * @todo fix extension and cache buster if url already has a query
              * @param  {String} id       The module ID e.q: 'ns/testA', './ns/testA', '../ns/testA' or full URL 'http://example.com/ns/testA.js'
              * @param  {String} basePath Will be used to find the correct dependencies path
              * @return {Object}          {id: 'ns/moduleA', loadUrl: 'http://example.com/ns/moduleA.js'}
              */
             function parseId(id, basePath) {
-                var extendsion = id.slice(-3) === '.js' ? '' : '.js',
-                    idPath, URI, URIbase, relative;
+                var cacheBuster = config.cache === FALSE ? '?bust=' + (+ new Date()) : '',
+                    idPath, URI, URIbase, relative, extension;
+                //is id not a  string 
+                if (!y.isString(id)) {
+                    return {
+                        id: ''
+                    };
+                }
+                extension = id.slice(-3) === '.js' ? '' : '.js';
                 //reserved for core modules
                 if (id.charAt(0) === '$') {
                     return {
@@ -698,11 +733,16 @@
                 if (URI.origin || idPath.charAt(0) === '/') {
                     return {
                         id: id,
-                        loadUrl: id + extendsion
+                        loadUrl: id + extension + cacheBuster
                     };
                 }
-                //use base path
-                URIbase = y.parseURI(basePath || config.baseUrl);
+                //if id path is relative we use base path else config.baseUrl
+                //else we use always config.baseUrl
+                if (id.charAt(0) === '.') {
+                    URIbase = y.parseURI(basePath || config.baseUrl);
+                } else {
+                    URIbase = y.parseURI(config.baseUrl);
+                }
                 basePath = URIbase.path;
                 // ./ns/module => ns/module
                 if (idPath.slice(0, 2) === './') {
@@ -710,7 +750,7 @@
                 }
                 //check path ( can't use path with ../)
                 relative = idPath.slice(0, 3) !== '../';
-                if (!relative) {
+                if (relative) {
                     idPath = idPath.split('/');
                     if (idPath.length > 1 && config.paths[idPath[0]]) {
                         idPath[0] = config.paths[idPath[0]];
@@ -742,12 +782,12 @@
                     //check of id has auto-select scheme
                     return {
                         id: idPath,
-                        loadUrl: URIbase.origin + idPath + extendsion
+                        loadUrl: URIbase.origin + idPath + extension + cacheBuster
                     };
                 }
                 return {
                     id: idPath,
-                    loadUrl: idPath + extendsion
+                    loadUrl: idPath + extension + cacheBuster
                 };
             }
             /**
@@ -810,21 +850,23 @@
                 if (loaded[id]) {
                     return; //error module already registered
                 }
-                //curry
                 if (y.isFunction(deps)) {
-                    scope = conf;
-                    conf = factory;
-                    factory = deps;
-                    deps = [];
+                    loaded[id] = {
+                        deps: [],
+                        factory: deps,
+                        conf: factory || 0,
+                        scope: conf || this, // jshint ignore:line
+                        init: FALSE
+                    };
+                } else {
+                    loaded[id] = {
+                        deps: deps,
+                        factory: factory,
+                        conf: conf || 0,
+                        scope: scope || this, // jshint ignore:line
+                        init: FALSE
+                    };
                 }
-                //load module
-                loaded[id] = {
-                    deps: deps,
-                    factory: factory,
-                    conf: conf || 0,
-                    scope: scope || root,
-                    init: FALSE
-                };
                 //clean
                 requested[id] = FALSE;
                 waiting[id] = FALSE;
@@ -848,21 +890,25 @@
                 }
                 //load deps
                 y.each(deps, function (id, i) {
-                    var module = loaded[parseId(id).id];
+                    var module = loaded[parseId(id).id],
+                        liveModule = module.factory;
                     if (!module.init) {
-                        module.factory = loadModule(module.deps, module.factory, module.conf, module.scope);
+                        liveModule = loadModule(module.deps, module.factory, module.conf, module.scope);
                         //check REFACTOR bit
-                        if (module.conf & ~REFACTOR) {
+                        if (!module.conf || module.conf & ~REFACTOR) {
+                            module.factory = liveModule;
                             module.init = TRUE;
                         }
                     }
-                    deps[i] = module.factory;
+                    deps[i] = liveModule;
                 });
                 //call factory
-                return factory.apply(scope, deps);
+                return factory.apply(scope || this, deps); // jshint ignore:line
             }
             //return the module
             return function () {
+                //merge config
+                config = y.merge(config, MCore.get('$/amd'), true);
                 return {
                     /**
                      * REFACTOR bit [1]
@@ -871,7 +917,8 @@
                      */
                     REFACTOR: REFACTOR,
                     def: function () {
-                        var arg = y.toArray(arguments);
+                        var arg = y.toArray(arguments),
+                            defaultScope = this;
                         //if ID is a string we want to register a module
                         if (y.isString(arg[0])) {
                             //check dependencies
@@ -881,12 +928,12 @@
                                     if (!getDependencies(arg[1])) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
-                                        registerModule.apply(null, arg);
+                                        registerModule.apply(defaultScope, arg);
                                     }
                                 });
                             } else {
                                 //register module
-                                registerModule.apply(null, arg);
+                                registerModule.apply(defaultScope, arg);
                             }
                         }
                         //load module with dependencies
@@ -898,21 +945,32 @@
                                     if (!getDependencies(arg[0])) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
-                                        loadModule.apply(this, arg);
+                                        loadModule.apply(defaultScope, arg);
                                     }
                                 });
                             } else {
-                                loadModule.apply(null, arg);
+                                loadModule.apply(defaultScope, arg);
                             }
                         }
                         //load module without dependencies
                         if (y.isFunction(arg[0])) {
-                            loadModule.apply(null, arg);
+                            loadModule.apply(defaultScope, arg);
                         }
                     }
                 };
             };
         }(Y(), Core(), Import()));
+    //bootstrap
+    (function (y) {
+        if (y.isArray(bootstrap)) {
+            y.each(bootstrap, function (elm) {
+                //check of bootstrap elm is a function
+                if (y.isFunction(elm)) {
+                    elm(Core());
+                }
+            });
+        }
+    }(Y()));
     /**
      * VP.js lib interface
      * @param {Y}       y       [description]
@@ -986,23 +1044,10 @@
                     subpub();
                 }
             } else {
-                arg.slice(0, 4); //if some try to change the scope
-                arg.push(Core());
-                def.apply(this, arg);
+                def.apply(Core(), arg);
             }
         };
     }(Y(), AMD(), Core()));
-    //bootstrap
-    (function (y) {
-        if (y.isArray(bootstrap)) {
-            y.each(bootstrap, function (elm) {
-                //check of bootstrap elm is a function 
-                if (y.isFunction(elm)) {
-                    elm();
-                }
-            });
-        }
-    }(Y()));
     //async
     (function (api, y) {
         //async API only needed if core is loaded for that async is defined

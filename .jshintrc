@@ -1,0 +1,21 @@
+{
+	"undef": true,
+	"unused": true,
+	"curly": true,
+	"eqeqeq": true,
+	"forin": true,
+	"freeze": true,
+	"indent": 4,
+	"latedef": true,
+	"noarg":  true,
+	"strict": true,
+	"browser": true,
+	"devel": true,
+	"newcap": false,
+	"es3": true,
+	"trailing": true,
+	"white": true,
+	"bitwise" : false,
+	"globals": {
+	}
+}
