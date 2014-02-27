@@ -26,6 +26,7 @@
             var proArr = Array.prototype,
                 proObj = Object.prototype,
                 nForEach = proArr.forEach,
+                nBind = Function.prototype.bind,
                 toString = proObj.toString,
                 slice = proArr.slice,
                 y = {
@@ -202,7 +203,7 @@
                         return;
                     }
                     //array with native support
-                    if (obj.forEach === nForEach) {
+                    if (nForEach && obj.forEach === nForEach) {
                         obj.forEach(iterator, context);
                     //Array and Arguments
                     } else if (isArray(obj) || isArguments(obj)) {
@@ -358,6 +359,35 @@
                 }
                 return TRUE;
             };
+            /**
+             * Function.bind shim, will delegate to native Function.bind if support
+             * @param  {Function} func      target function
+             * @param  {Object} thisArg     'this' to bind
+             * @return {Function}           bound function
+             */
+            y.bind = function (func, thisArg) {
+                var args, bound, fcon;
+                //native bind
+                if (nBind && func.bind === nBind) {
+                    return nBind.apply(func, slice.call(arguments, 1));
+                }
+                //check of fist func is a function
+                if (!y.isFunction(func)) {
+                    throw new TypeError();
+                }
+                //arguments that we want to bind
+                args = slice.call(arguments, 2);
+                fcon = function () {};
+                //bound function
+                bound = function () {
+                    var self = this instanceof fcon && thisArg ? this : thisArg;
+                    return func.apply(self, args.concat(y.toArray(arguments)));
+                };
+                //bound constructor
+                fcon.prototype = func.prototype;
+                bound.prototype = new fcon();
+                return bound;
+            };
             //return module
             return function () {
                 return y;
@@ -458,8 +488,8 @@
                                 }
                                 //add subscriber
                                 subscribers[parseEvnt].push([
-                                    //TODO write y.bind ( cross browser bind )
-                                    subscriber.bind(y.merge({
+                                    //bind thisArg with subscriber
+                                    y.bind(subscriber, y.merge({
                                         subscriber: subscriber
                                     }, thisArg)),
                                     scope,
@@ -903,7 +933,7 @@
                     deps[i] = liveModule;
                 });
                 //call factory
-                return factory.apply(scope || this, deps); // jshint ignore:line
+                return factory.apply(scope || this, deps || []); // jshint ignore:line
             }
             //return the module
             return function () {
