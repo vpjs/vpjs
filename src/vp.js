@@ -27,21 +27,22 @@
                 proObj = Object.prototype,
                 nForEach = proArr.forEach,
                 nBind = Function.prototype.bind,
+                nKeys = proObj.keys,
                 toString = proObj.toString,
                 slice = proArr.slice,
                 y = {
                     /**
                     * Is a given value a object?
-                    * @param {Object}
+                    * @param {*}
                     * @param {Boolaen} literal check of object is a literal object
                     * @return {Boolean}
                     */
                     isObject: function (obj, literal) {
-                        return proObj.constructor(obj) === obj && (!literal || obj.constructor === Object);
+                        return Object(obj) === obj && (!literal || obj.constructor === Object);
                     },
                     /**
                     * Is a given value a regular expression?
-                    * @param {Object}
+                    * @param {*}
                     * @return {Boolean}
                     */
                     isRegex: function (obj) {
@@ -49,15 +50,15 @@
                     },
                     /**
                      * Is given value undefined?
-                     * @param  {Objec}      obj [description]
-                     * @return {Boolean}        [description]
+                     * @param  {*} obj
+                     * @return {Boolean}
                      */
                     isUndefined: function (obj) {
                         return obj === void 0;
                     },
                     /**
                     * Is a given value a boolean?
-                    * @param {Object}
+                    * @param {*} obj
                     * @return {Boolean}
                     */
                     isBool: function (obj) {
@@ -65,7 +66,7 @@
                     },
                     /**
                     * Is a given value a DOM element?
-                    * @param {Object}
+                    * @param {*} obj
                     * @return {Boolean}
                     */
                     isElement: function (obj) {
@@ -73,8 +74,20 @@
                     },
                     /**
                      * Parse a URI and return its components
-                     * @param  {String} str [description]
-                     * @return {Object}     [description]
+                     * returns the following components and only if they are in the given string
+                     * scheme: http
+                     * host: example.com
+                     * port: 80
+                     * pass: password
+                     * user: username
+                     * origin: http://username:password@example.com
+                     * path: /path/file.php
+                     * dir: /path/
+                     * file: file.php
+                     * query: arg1=2&arg2=1
+                     * fragment: !/hashvalue
+                     * @param  {String} str
+                     * @return {Object}
                      */
                     parseURI: function (str) {
                         var URI = {},
@@ -139,7 +152,7 @@
                     },
                     /**
                      * Will only call the given function once.
-                     * After that it will return the result of this one call
+                     * After that it will return the result of this call
                      * @param  {Function} func
                      * @return {Function}
                      */
@@ -155,11 +168,29 @@
                             func = null;
                             return result;
                         };
+                    },
+                    /**
+                     * Object.is shim
+                     * @param  {*} obj1
+                     * @param  {*} obj2
+                     * @return {Boolean}
+                     */
+                    is: proObj.is || function (obj1, obj2) {
+                        //Check 0 and -0
+                        if (obj1 === 0 && obj2 === 0) {
+                            return 1 / obj1 === 1 / obj2;
+                        }
+                        //if obj1 is not equal to himself like Number.NaN
+                        if (obj1 !== obj1) {
+                            return obj2 !== obj2;
+                        }
+                        //default
+                        return obj1 === obj2;
                     }
                 },
                 /**
-                 * Is Object an Array?
-                 * @param  {Object} obj
+                 * Is given value an Array?
+                 * @param  {*} obj
                  * @return {Boolean}
                  */
                 isArray = y.isArray = proArr.isArray || function (obj) {
@@ -175,7 +206,8 @@
                     return obj.hasOwnProperty(key);
                 },
                 /**
-                 * Is object an Arguments object
+                 * Is given value an arguments object
+                 * @param {*}
                  * @return {Boolean}
                  */
                 isArguments = y.isArguments = (function () {
@@ -193,9 +225,9 @@
                 }()),
                 /**
                  * Will loop trough Array's, Arguments and Objects
-                 * @param  {Object} obj
-                 * @param  {Function} iterator
-                 * @param  {Object} context
+                 * @param  {Array|Object}   obj
+                 * @param  {Function}       iterator
+                 * @param  {*}              context
                  */
                 each = y.each = function (obj, iterator, context) {
                     //null we can't interate that
@@ -222,7 +254,7 @@
                 };
             /**
              * is give object a ( function, string, number, data )
-             * @param  {Object} obj
+             * @param  {*} obj
              * @return {Boolean}
              */
             each(['Function', 'String', 'Number', 'Date'], function (is) {
@@ -231,63 +263,112 @@
                 };
             });
             /**
-            * Has given obj, needed string, property or obj
-            * @param {Sting|Array|Object} obj
-            * @param {String} needed
+            * Has the first parameter the needed value?
+            * By a string and array it will search in the string for the needed value
+            * By a number it will check of the first parameter is bigger or equal than the needed number
+            * By a object it will check of the object has needed property
+            * By everything else it will compare the 2 both parameters and if they are the same it will return true.
+            * @example
+            * Y.has("test", "e") will return true
+            * Y.has([1], 1) will return true
+            * Y.has({x:1}, "x") will return true
+            * Y.has(null, null) will return true
+            * Y.has(10, 5) will return true
+            * @param  {*}       obj
+            * @param  {*}       needed
             * @return {Boolean}
             */
             y.has = function (obj, needed) {
-                //Contains the string the needed string?
+                //Has the string needed string ?
                 if (y.isString(obj)) {
                     if (obj.indexOf(needed) !== -1) {
                         return TRUE;
                     }
                     return FALSE;
                 }
-                //Contains the Array the needed obj/string?
+                //Has array needed element?
                 if (y.isArray(obj)) {
                     if (y.indexOf(obj, needed) !== -1) {
                         return TRUE;
                     }
                     return FALSE;
                 }
-                //default has object needed property
-                return y.hasop(obj, needed);
+                //Has number the needed number
+                if (y.isNumber(obj)) {
+                    return obj >= needed;
+                }
+                //Has object needed property
+                if (y.isObject(obj)) {
+                    return y.hasop(obj, needed);
+                }
+                //if null, undefined if they are equal they 
+                return obj === needed;
             };
             /**
-            * Safely convert anything iterable into a real, live array.
-            * @param {Object}
+            * Convert anything to a Array.
+            * @example
+            * Y.toArray("test") will return ["t","e","s","t"]
+            * Y.toArray({a:1}) will return [1]
+            * Y.toArray({a:1}, true) will return ['a'], same as Y.key
+            * Y.toArray(null) will return [null]
+            * @param {*} obj
+            * @param {Bolean} keys can be used by a object to return the keys instead of the values
             * @return {Array}
             */
-            y.toArray = function (iterable) {
+            y.toArray = function (obj, keys) {
                 var temp = [];
                 //Arguments to Array
-                if (isArguments(iterable)) {
-                    return slice.call(iterable);
+                if (isArguments(obj)) {
+                    return slice.call(obj);
                 }
                 //String to Array
-                if (y.isString(iterable)) {
-                    return iterable.split('');
+                if (y.isString(obj)) {
+                    return obj.split('');
                 }
                 //Array to Array
-                if (isArray(iterable)) {
-                    return slice.call(iterable);
+                if (isArray(obj)) {
+                    return slice.call(obj);
                 }
                 //Object to Array
-                if (y.isObject(iterable)) {
-                    each(iterable, function (value) {
-                        temp.push(value);
+                if (y.isObject(obj)) {
+                    //if keys is true and Object.keys is supported use Object.keys
+                    if (keys && nKeys) {
+                        return nKeys(obj);
+                    }
+                    each(obj, function (value, key) {
+                        temp.push(keys ? key : value);
                     });
                     return temp;
                 }
                 //Array :)
-                return [iterable];
+                return [obj];
             };
             /**
-             * Merge based on the type of the first parameter
-             * @param {Array|Object}            firstParam, if not a array or object then it will use string concatenation
-             * @param {Boolean}                 lastParam   if true and firstParam is a object
-             * @return {Array|Object|String}
+             * Returns an array of a given object's own enumerable properties
+             * @param  {Object} obj
+             * @return {Array}
+             */
+            y.keys = nKeys || function (obj) {
+                if (!y.isObject(obj)) {
+                    throw new TypeError(obj + ' is not an object');
+                }
+                return y.toArray(obj, true);
+            };
+            /**
+             * Will merge all parameters based on the type of the first parameter.
+             * If the first parameter is a Array then it will treat all other parameters as a Array by using Y.toArray
+             * If the first parameter is a Object it will extend this object with the other objects
+             * All other types will be merge to 1 single string
+             * IF the first parameter is a Object and the last parameter is a boolean it will do a deep merge of all the object objects,
+             *     meaning that if a property contains a object from the first parameter it will also merge that
+             * @example
+             * merge({x:1}, {y:1}) will result in {x:1, y:1}
+             * merge([1], [2]) will result in [1,2]
+             * merge({x:{y:2}}, {x:{z:1}}, true) will result in  {x:{y:2,z:1}}
+             * @param   {Array|Object|*}        target
+             * @param   {...*}                  items
+             * @param   {Boolean=false}         deep
+             * @return  {Array|Object|String}
              */
             y.merge = function () {
                 var arg = y.toArray(arguments),
@@ -321,21 +402,25 @@
                     });
                     return obj1;
                 }
-                //all other type
+                //all other types
                 arg.unshift(obj1);
                 return arg.join('');
             };
             /**
-             * Is a given object empty?
-             * undefined, null, false, 0, "0"
-             * @param  {Object}     obj Object that you want to check
-             * @return {Boolean}        if empty true
+             * Is a given value empty?
+             * undefined, null, false, 0, "0", "", NaN and {} are empty values
+             * @param  {*} obj
+             * @return {Boolean}
              */
             y.empty = function (obj) {
                 var str;
                 //undefined, null, false, 0 and ''
                 if (!obj) {
                     return TRUE;
+                }
+                //0 string
+                if (obj === '0') {
+                    return FALSE;
                 }
                 //Array
                 if (isArray(obj)) {
@@ -344,7 +429,7 @@
                 //shouldn't happen but if someone used new [Type]
                 str = '' + obj; //to string
                 //new String and new Number
-                if (y.isString(obj) && y.isNumber(obj)) {
+                if (y.isString(obj) || y.isNumber(obj)) {
                     return str === '' || str === '0';
                 }
                 //new Boolean()
@@ -361,9 +446,9 @@
             };
             /**
              * Function.bind shim, will delegate to native Function.bind if support
-             * @param  {Function} func      target function
-             * @param  {Object} thisArg     'this' to bind
-             * @return {Function}           bound function
+             * @param  {Function}   func        target function
+             * @param  {*}          thisArg     'this' to bind
+             * @return {Function}               bound function
              */
             y.bind = function (func, thisArg) {
                 var args, bound, fcon;
@@ -406,9 +491,9 @@
                     /**
                      * Publish a event
                      * @param  {String}     evnt        The event that you want to publish
-                     * @param  {Object}     data        Data that you want to send with the event
-                     * @param  {Object}     scope       Event scope
-                     * @param  {Boolean}    notAsync    default events are async but i some case yo don't want that
+                     * @param  {*}          data        Data that you want to send along with the event
+                     * @param  {*}          scope       Event scope
+                     * @param  {Boolean}    notAsync    Events are default asynchronous, but in some cases yo don't want that
                      */
                     pub: function (evnt, data, scope, notAsync) {
                         var evntPart = '',
@@ -422,7 +507,7 @@
                             }
                             //remove event
                             evnt = evnt.split('@')[0];
-                            //subscriber without id 
+                            //subscriber without id
                             if (evnt !== originEvent && subscribers[evnt]) {
                                 subs = subs.concat(subscribers[evnt]);
                             }
@@ -468,8 +553,8 @@
                      *     'a#$' [a event can't have other characters than a-z or 0-9]
                      * @param {String}     evnt       The event where you want to subscribe
                      * @param {Function}   subscriber The subscriber to the events
-                     * @param {Object}     scope      Scope can be used to only subscribe to events that are in that scope
-                     * @param {Object}     thisArg    The `this` scope  of the subscriber
+                     * @param {*}          scope      Scope can be used to only subscribe to events that are in that scope
+                     * @param {*}          thisArg    The `this` scope  of the subscriber
                      */
                     sub: function (evnt, subscriber, scope, thisArg) {
                         var allEvnt = evnt.split('|'),
@@ -501,9 +586,9 @@
                     },
                     /**
                      * Unsubscribe a subscriber from a event
-                     * @param  {String} evnt       Event where from you want to unsubscribe
-                     * @param  {[type]} subscriber the subscriber
-                     * @param  {[type]} scope      the scope if used by subscribing
+                     * @param  {String}     evnt       Event where from you want to unsubscribe
+                     * @param  {Function}   subscriber the subscriber
+                     * @param  {*}          scope      the scope if used by subscribing
                      */
                     unsub: function (evnt, subscriber, scope) {
                         y.each(subscribers[evnt], function (sub, i) {
