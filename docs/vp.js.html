@@ -1,4 +1,31 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: vp.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: vp.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * vp.js
  * IMPORTANT this project is still in draft.
  * @author Victor Perez
@@ -58,7 +85,7 @@
                     * @method $/y.isObject
                     */
                     isObject: function (obj, literal) {
-                        return Object(obj) === obj && (!literal || obj.constructor === Object);
+                        return Object(obj) === obj &amp;&amp; (!literal || obj.constructor === Object);
                     },
                     /**
                     * Is a given value a regular expression?
@@ -67,7 +94,7 @@
                     * @method $/y.isRegex
                     */
                     isRegex: function (obj) {
-                        return obj && (obj.ignoreCase || obj.ignoreCase === FALSE) && obj.test && obj.exec;
+                        return obj &amp;&amp; (obj.ignoreCase || obj.ignoreCase === FALSE) &amp;&amp; obj.test &amp;&amp; obj.exec;
                     },
                     /**
                      * Is given value undefined?
@@ -94,7 +121,7 @@
                     * @method $/y.isElement
                     */
                     isElement: function (obj) {
-                        return !!(obj && obj.nodeType === 1);
+                        return !!(obj &amp;&amp; obj.nodeType === 1);
                     },
                     /**
                      * Parse a URI and return its components
@@ -110,7 +137,7 @@
                      *     path: '/path/file.php',
                      *     dir: '/path/',
                      *     file: 'file.php',
-                     *     query: 'arg1=2&arg2=1',
+                     *     query: 'arg1=2&amp;arg2=1',
                      *     fragment: 'hashvalue'
                      * }
                      * @param  {String} str
@@ -139,7 +166,7 @@
                                 URI.port = +temp[3];
                                 origin += ':' + URI.port;
                             }
-                            //user & pass
+                            //user &amp; pass
                             temp = /^(([^:]+:)?\/\/)?([^\/@]+)@/.exec(str);
                             if (temp) {
                                 origin = temp[3] + '@' + origin;
@@ -207,7 +234,7 @@
                      */
                     is: proObj.is || function (obj1, obj2) {
                         //Check 0 and -0
-                        if (obj1 === 0 && obj2 === 0) {
+                        if (obj1 === 0 &amp;&amp; obj2 === 0) {
                             return 1 / obj1 === 1 / obj2;
                         }
                         //if obj1 is not equal to himself like Number.NaN
@@ -253,7 +280,7 @@
                     }
                     //fall back for IE;
                     return function (obj) {
-                        return !!(obj && hasop(obj, 'callee'));
+                        return !!(obj &amp;&amp; hasop(obj, 'callee'));
                     };
                 }()),
                 /**
@@ -269,11 +296,11 @@
                         return;
                     }
                     //array with native support
-                    if (nForEach && obj.forEach === nForEach) {
+                    if (nForEach &amp;&amp; obj.forEach === nForEach) {
                         obj.forEach(callback, thisArg);
                     //Array and Arguments
                     } else if (isArray(obj) || isArguments(obj)) {
-                        for (var i = 0, max = obj.length; i < max; i++) {
+                        for (var i = 0, max = obj.length; i &lt; max; i++) {
                             callback.call(thisArg, obj[i], i, obj);
                         }
                     //Objects
@@ -386,7 +413,7 @@
                 //Object to Array
                 if (y.isObject(obj)) {
                     //if keys is true and Object.keys is supported use Object.keys
-                    if (keys && nKeys) {
+                    if (keys &amp;&amp; nKeys) {
                         return nKeys(obj);
                     }
                     each(obj, function (value, key) {
@@ -430,7 +457,7 @@
                 var arg = y.toArray(arguments),
                     obj1 = arg.shift(),
                     deep = arg[arg.length - 1] === TRUE ? TRUE : FALSE;
-                if (y.isObject(obj1) && deep) {
+                if (y.isObject(obj1) &amp;&amp; deep) {
                     arg.pop();
                 }
                 //array
@@ -449,7 +476,7 @@
                         }
                         each(obj, function (value, key) {
                             //deep
-                            if (deep && y.isObject(obj1[key])) {
+                            if (deep &amp;&amp; y.isObject(obj1[key])) {
                                 y.merge(obj1[key], value, true);
                             } else {
                                 obj1[key] = value;
@@ -512,7 +539,7 @@
             y.bind = function (func, thisArg) {
                 var args, bound, fcon;
                 //native bind
-                if (nBind && func.bind === nBind) {
+                if (nBind &amp;&amp; func.bind === nBind) {
                     return nBind.apply(func, slice.call(arguments, 1));
                 }
                 //check of fist func is a function
@@ -524,7 +551,7 @@
                 fcon = function () {};
                 //bound function
                 bound = function () {
-                    var self = this instanceof fcon && thisArg ? this : thisArg;
+                    var self = this instanceof fcon &amp;&amp; thisArg ? this : thisArg;
                     return func.apply(self, args.concat(y.toArray(arguments)));
                 };
                 //bound constructor
@@ -566,13 +593,13 @@
                             //remove event
                             evnt = evnt.split('@')[0];
                             //subscriber without id
-                            if (evnt !== originEvent && subscribers[evnt]) {
+                            if (evnt !== originEvent &amp;&amp; subscribers[evnt]) {
                                 subs = subs.concat(subscribers[evnt]);
                             }
                             //wild card
                             evnt = evnt.split('.');
                             evntPart = evnt[0];
-                            for (var i = 1, max = evnt.length - 1; i < max; i++) {
+                            for (var i = 1, max = evnt.length - 1; i &lt; max; i++) {
                                 evntPart += '.' + evnt[i];
                                 if (subscribers[evntPart + '.*']) {
                                     subs = subs.concat(subscribers[evntPart]);
@@ -616,7 +643,7 @@
                         var allEvnt = evnt.split('|'),
                             parseEvnt;
                         //loop though all events
-                        for (var i = 0, max = allEvnt.length; i < max; i++) {
+                        for (var i = 0, max = allEvnt.length; i &lt; max; i++) {
                             parseEvnt = allEvnt[i];
                             if (validSubscribe.test(allEvnt[i])) {
                                 //TODO
@@ -648,7 +675,7 @@
                      */
                     unsub: function (evnt, subscriber, scope) {
                         y.each(subscribers[evnt], function (sub, i) {
-                            if (sub[2] === subscriber && (!sub[1] || sub[1] === scope)) {
+                            if (sub[2] === subscriber &amp;&amp; (!sub[1] || sub[1] === scope)) {
                                 subscribers[evnt].splice(i, 1);
                             }
                         });
@@ -721,10 +748,10 @@
                             };
                         } else {
                             //if protected
-                            if (config[key].o & 2) {
+                            if (config[key].o &amp; 2) {
                                 return coreApi;
                             }
-                            if (config[key].o & 1 || opt & 1) {
+                            if (config[key].o &amp; 1 || opt &amp; 1) {
                                 y.merge(config[key].d, value, true);
                             }
                         }
@@ -771,7 +798,7 @@
                      */
                     push: function (call, arg, opt, thisArg) {
                         queue.push([call, arg || [], opt, thisArg]);
-                        if (!paused && !running) {
+                        if (!paused &amp;&amp; !running) {
                             next();
                         }
                         return api;
@@ -794,7 +821,7 @@
                         } else {
                             paused = !paused;
                         }
-                        if (!paused && !running) {
+                        if (!paused &amp;&amp; !running) {
                             next();
                         }
                         return api;
@@ -960,7 +987,7 @@
                 relative = idPath.slice(0, 3) !== '../';
                 if (relative) {
                     idPath = idPath.split('/');
-                    if (idPath.length > 1 && config.paths[idPath[0]]) {
+                    if (idPath.length > 1 &amp;&amp; config.paths[idPath[0]]) {
                         idPath[0] = config.paths[idPath[0]];
                     }
                     idPath = idPath.join('/');
@@ -1014,7 +1041,7 @@
                     var parsedId = parseId(depId, id);
                     depId = parsedId.id;
                     //module isn't loaded and requested
-                    if (!loaded[depId] && !requested[depId] && !waiting[depId]) {
+                    if (!loaded[depId] &amp;&amp; !requested[depId] &amp;&amp; !waiting[depId]) {
                         //loadUrl can be empty if a reserved id is used
                         if (parsedId.loadUrl) {
                             needed.push(parsedId.loadUrl);
@@ -1103,7 +1130,7 @@
                     if (!module.init) {
                         liveModule = loadModule(module.deps, module.factory, module.conf, module.scope);
                         //check REFACTOR bit
-                        if (!module.conf || module.conf & ~REFACTOR) {
+                        if (!module.conf || module.conf &amp; ~REFACTOR) {
                             module.factory = liveModule;
                             module.init = TRUE;
                         }
@@ -1139,7 +1166,7 @@
                         //if ID is a string we want to register a module
                         if (y.isString(arg[0])) {
                             //check dependencies
-                            if (y.isArray(arg[1]) && getDependencies(arg[1], arg[0])) {
+                            if (y.isArray(arg[1]) &amp;&amp; getDependencies(arg[1], arg[0])) {
                                 //subscribe and wait when all modules are loaded
                                 subscribe(evntModule + 'loaded', function () {
                                     if (!getDependencies(arg[1])) {
@@ -1217,7 +1244,7 @@
          * vpjs('event', function () {}); //@todo
          * vpjs('event', {}, function () {}); //@todo
          * vpjs('>event'); //{@link $/events~pub}
-         * vpjs('<event', function(){}); //{@link $/events~sub}
+         * vpjs('&lt;event', function(){}); //{@link $/events~sub}
          * //String contains a path
          * vpjs('ns/module', function() {}); //{@link $/amd~def}
          * @example
@@ -1237,7 +1264,7 @@
          */
         return function (p1, p2, p3) {
             var arg = y.toArray(arguments),
-                prefix = /^(<|>)(.*)/.exec(p1);
+                prefix = /^(&lt;|>)(.*)/.exec(p1);
             /**
              * Subscribe once and publish in the same time.
              * Use this only with  Message broker rules
@@ -1263,12 +1290,12 @@
                 MCore.pub(evnt, data, scope);
             }
             //check of string is a event or we need to load a module
-            if (prefix || y.isString(arg[0]) && !y.has(arg[0], '/')) {
+            if (prefix || y.isString(arg[0]) &amp;&amp; !y.has(arg[0], '/')) {
                 if (prefix) {
                     //subscribe only
                     switch (prefix[1]) {
                         //subscribe only
-                        case '<':
+                        case '&lt;':
                             MCore.sub(prefix[2], p2, p3, Core());
                             break;
                         //publish only
@@ -1333,7 +1360,7 @@
                 isFrame = win.frameElement !== NULL;
             } catch (e) {}
             // if not in a iframe
-            if (!isFrame && doc.documentElement.doScroll) {
+            if (!isFrame &amp;&amp; doc.documentElement.doScroll) {
                 tryScroll();
             }
             // iFrame needs different code :|
@@ -1354,4 +1381,26 @@
             }
         }
     }(Core().pub, Y().once));
-}(this, this.__VPJSNS__ || 'vpjs', this.__VPJSBOOTSTRAP__ || []));
+}(this, this.__VPJSNS__ || 'vpjs', this.__VPJSBOOTSTRAP__ || []));</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="amd.html">$/amd</a></li><li><a href="core.html">$/core</a></li><li><a href="events.html">$/events</a></li><li><a href="import.html">$/import</a></li><li><a href="queue.html">$/queue</a></li><li><a href="y.html">$/y</a></li></ul><h3>Global</h3><ul><li><a href="global.html#__VPJSBOOTSTRAP__">__VPJSBOOTSTRAP__</a></li><li><a href="global.html#__VPJSNS__">__VPJSNS__</a></li><li><a href="global.html#define">define</a></li><li><a href="global.html#vpjs">vpjs</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Mon Mar 03 2014 21:54:44 GMT+0100 (W. Europe Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
