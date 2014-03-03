@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Global</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Global</h1>
+    
+    
+
+
+
+<section>
+    
+<header>
+    <h2>
+    
+    </h2>
+    
+</header>  
+
+<article>
+    <div class="container-overview">
+    
+    
+    
+        
+        
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+        
+        
+    
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        <h3 class="subsection-title">Members</h3>
+        
+        <dl>
+            
+<dt>
+    <h4 class="name" id="__VPJSBOOTSTRAP__"><span class="type-signature"></span>__VPJSBOOTSTRAP__<span class="type-signature"> :Array</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        You can define the bootstrap via __VPJSBOOTSTRAP__, this must be array of functions.Each function will be called with 1 parameter, what is the vp.js core moduleImportant, the bootstrap must be defined before loading the library!
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Array</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line14">line 14</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var __VPJSBOOTSTRAP__ = [function (Core) {    Core.set();}];</code></pre>
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="__VPJSNS__"><span class="type-signature"></span>__VPJSNS__<span class="type-signature"> :string</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        You can change the namespace via __VPJSNS__, all core events will start with you defined namespace and not with vpjs
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>vpjs</li>
+        </ul></dd>
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="vpjs"><span class="type-signature"></span>vpjs<span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Core vp.js interfaceThe behavior can be deferent, base on the first parameter
+    </div>
+    
+    
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1210">line 1210</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>//Stringvpjs('event'); // will publish a eventvpjs('event', {}); // will publish a event with datavpjs('event', function () {}); //@todovpjs('event', {}, function () {}); //@todovpjs('>event'); //<a href="events.html#pub">$/events~pub</a>vpjs('&lt;event', function(){}); //<a href="events.html#sub">$/events~sub</a>//String contains a pathvpjs('ns/module', function() {}); //<a href="amd.html#def">$/amd~def</a></code></pre>
+
+    <pre class="prettyprint"><code>//Arrayvpjs(['Module']); //<a href="amd.html#def">$/amd~def</a>vpjs(['Module'], function () {}); //<a href="amd.html#def">$/amd~def</a></code></pre>
+
+    <pre class="prettyprint"><code>//Functionvpjs(function(){}); //<a href="amd.html#def">$/amd~def</a></code></pre>
+
+    
+</dd>
+
+        </dl>
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
+        
+        <dl>
+            
+<dt>
+    <h4 class="name" id="define"><span class="type-signature"></span>define<span class="signature">(id, deps, factory)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        AMD module loading via define
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>deps</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>factory</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1206">line 1206</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        </dl>
+    
+    
+    
+    
+    
+</article>
+
+</section>  
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="amd.html">$/amd</a></li><li><a href="core.html">$/core</a></li><li><a href="events.html">$/events</a></li><li><a href="import.html">$/import</a></li><li><a href="queue.html">$/queue</a></li><li><a href="y.html">$/y</a></li></ul><h3>Global</h3><ul><li><a href="global.html#__VPJSBOOTSTRAP__">__VPJSBOOTSTRAP__</a></li><li><a href="global.html#__VPJSNS__">__VPJSNS__</a></li><li><a href="global.html#define">define</a></li><li><a href="global.html#vpjs">vpjs</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Mon Mar 03 2014 21:54:44 GMT+0100 (W. Europe Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
