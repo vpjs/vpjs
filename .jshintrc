@@ -16,6 +16,8 @@
 	"trailing": true,
 	"white": true,
 	"bitwise" : false,
+	"esnext": true,
 	"globals": {
+		"Promise": true
 	}
 }

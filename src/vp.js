@@ -216,6 +216,14 @@
                         }
                         //default
                         return obj1 === obj2;
+                    },
+                    /**
+                     * Date.now shim
+                     * @return {Number} number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
+                     * @method $/y.now
+                     */
+                    now: Date.now || function () {
+                        return (+new Date());
                     }
                 },
                 /**
@@ -839,8 +847,8 @@
                 return {
                     /**
                      * Load a script async
-                     * @param  {String|Array}     url      script url
-                     * @param  {Function}   callback callback if script is loaded
+                     * @param  {String|Array}   url      script url
+                     * @param  {Function}       callback callback if script is loaded
                      */
                     script: function (urls, callback) {
                         //if urls is a array of urls
@@ -895,6 +903,9 @@
                         },
                         deps: [],
                         conf: REFACTOR
+                    },
+                    '$/promise': {
+
                     }
                 },
                 requested = {},
@@ -919,7 +930,7 @@
              * @return {Object}          {id: 'ns/moduleA', loadUrl: 'http://example.com/ns/moduleA.js'}
              */
             function parseId(id, basePath) {
-                var cacheBuster = config.cache === FALSE ? '?bust=' + (+ new Date()) : '',
+                var cacheBuster = config.cache === FALSE ? '?bust=' + y.now() : '',
                     idPath, URI, URIbase, relative, extension;
                 //is id not a  string 
                 if (!y.isString(id)) {
@@ -1247,7 +1258,7 @@
                     data = p2,
                     subscriber = p3,
                     scope = p3,
-                    id = +new Date();
+                    id = y.now()
                 //add id if need
                 if (!y.has(evnt, '@')) {
                     evnt += '@' + id;
