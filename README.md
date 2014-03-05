@@ -1,3 +1,3 @@
 vp.js
 ====
-http://victor-perez.github.io/vpjs/
+http://vpjs.victor-perez.com
