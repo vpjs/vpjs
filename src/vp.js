@@ -1258,7 +1258,7 @@
                     data = p2,
                     subscriber = p3,
                     scope = p3,
-                    id = y.now()
+                    id = y.now();
                 //add id if need
                 if (!y.has(evnt, '@')) {
                     evnt += '@' + id;
