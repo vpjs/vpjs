@@ -43,8 +43,8 @@
  * Each function will be called with 1 parameter, what is the vp.js core module
  * Important, the bootstrap must be defined before loading the library!
  * @example
- * var __VPJSBOOTSTRAP__ = [function (Core) {
- *     Core.set();
+ * var __VPJSBOOTSTRAP__ = [function (vp) {
+ *     vp.set();
  * }];
  * @name __VPJSBOOTSTRAP__
  * @type {?Array}
@@ -64,6 +64,7 @@
         async = root[ns],
         win = window,
         doc = win.document,
+        VPconfig = {},
         /**
          * Utility module
          * @module $/y
@@ -122,90 +123,7 @@
                     */
                     isElement: function (obj) {
                         return !!(obj &amp;&amp; obj.nodeType === 1);
-                    },
-                    /**
-                     * Parse a URI and return its components
-                     * returns the following components and only if they are in the given string
-                     * @example
-                     * {
-                     *     scheme: 'http',
-                     *     host: 'example.com',
-                     *     port: 80
-                     *     pass: 'password',
-                     *     user: 'username',
-                     *     origin: 'http://username:password@example.com:80',
-                     *     path: '/path/file.php',
-                     *     dir: '/path/',
-                     *     file: 'file.php',
-                     *     query: 'arg1=2&amp;arg2=1',
-                     *     fragment: 'hashvalue'
-                     * }
-                     * @param  {String} str
-                     * @return {Object}
-                     * @method $/y.parseURI
-                     */
-                    parseURI: function (str) {
-                        var URI = {},
-                            origin,
-                            temp;
-                        //scheme, only file can have ///
-                        temp = /^([^:]+):\/\/[^\/]|(file):\/\/\/?/.exec(str);
-                        if (temp) {
-                            origin += URI.scheme = (temp[1] || temp[2]).toLowerCase();
-                        }
-                        //file can't have, host, port, user or pass
-                        if (URI.scheme !== 'file') {
-                            //[scheme]://(domain) or //(host) or host[:port]  or [user]:[pass]@(host)
-                            temp = /^([^:]+:)?\/\/([^@]+@)?([^:\/]+)/.exec(str) || /^[^@\/]+@([^:\/]+)/.exec(str) || /^([:\/]+):[1-9][0-9]*/.exec(str);
-                            if (temp) {
-                                origin += URI.host = (temp[2] || temp[1]).toLowerCase();
-                            }
-                            //port
-                            temp = /^(([^:]+:)?\/\/)?[^\/]+:([1-9][0-9]*)/.exec(str);
-                            if (temp) {
-                                URI.port = +temp[3];
-                                origin += ':' + URI.port;
-                            }
-                            //user &amp; pass
-                            temp = /^(([^:]+:)?\/\/)?([^\/@]+)@/.exec(str);
-                            if (temp) {
-                                origin = temp[3] + '@' + origin;
-                                temp = temp[3].split(':');
-                                if (temp.length > 1) {
-                                    URI.pass = temp[1];
-                                }
-                                URI.user = temp[0];
-                            }
-                        }
-                        //path
-                        if (origin) {
-                            str = str.substr(origin.length);
-                            URI.origin = origin;
-                        }
-                        //path, dir and file
-                        temp = /([^?#]+)/.exec(str);
-                        if (temp) {
-                            URI.path = temp = temp[1];
-                            temp = temp.split('/');
-                            if (temp[temp.length - 1] !== '') {
-                                URI.file = temp.pop();
-                                temp.push('');
-                            }
-                            URI.dir = temp.join('/');
-                        }
-                        //query
-                        temp = /[^#?]*\?([^#]*)/.exec(str);
-                        if (temp) {
-                            URI.query = temp[1];
-                        }
-                        //fragment
-                        temp = /#(.*)/.exec();
-                        if (temp) {
-                            URI.fragment = temp[1];
-                        }
-                        return URI;
-                    },
-                    /**
+                    },                    /**
                      * Will only call the given function once.
                      * After that it will return the result of this call
                      * @param  {Function} func
@@ -369,17 +287,11 @@
             y.has = function (obj, needed) {
                 //Has the string needed string ?
                 if (y.isString(obj)) {
-                    if (obj.indexOf(needed) !== -1) {
-                        return TRUE;
-                    }
-                    return FALSE;
+                    return !!~obj.indexOf(needed);
                 }
                 //Has array needed element?
                 if (y.isArray(obj)) {
-                    if (y.indexOf(obj, needed) !== -1) {
-                        return TRUE;
-                    }
-                    return FALSE;
+                    return !!~y.indexOf(obj, needed);
                 }
                 //Has number the needed number
                 if (y.isNumber(obj)) {
@@ -389,7 +301,7 @@
                 if (y.isObject(obj)) {
                     return y.hasop(obj, needed);
                 }
-                //if null, undefined if they are equal they 
+                //if null, undefined if they are equal they
                 return obj === needed;
             };
             /**
@@ -432,6 +344,112 @@
                 //Array :)
                 return [obj];
             };
+            /**
+             * Memorize results of an expensive function
+             * @param  {function} func      function where from you want to memorize the result
+             * @param  {function} [hasher]  hasher function, default it will hash the parameters
+             * @return {function}
+             * @method $/y.memoize
+             */
+            y.memoize = function (func, hasher) {
+                var cache = {};
+                //set default hasher
+                hasher = hasher || function () {
+                   return y.toArray(arguments);
+                }
+                //new function
+                return function () {
+                    var key = hasher.apply(this, arguments);
+                    //if cached return cache
+                    if (cache[key]) {
+                        return cache[key];
+                    }
+                    //run function and cache result
+                    return cache[key] = func.apply(this, arguments);
+                }
+            };
+            /**
+             * Parse a URI and return its components
+             * returns the following components and only if they are in the given string
+             * @example
+             * {
+             *     scheme: 'http',
+             *     host: 'example.com',
+             *     port: 80
+             *     pass: 'password',
+             *     user: 'username',
+             *     origin: 'http://username:password@example.com:80',
+             *     path: '/path/file.php',
+             *     dir: '/path/',
+             *     file: 'file.php',
+             *     query: 'arg1=2&amp;arg2=1',
+             *     fragment: 'hashvalue'
+             * }
+             * @param  {String} str
+             * @return {Object}
+             * @method $/y.parseURI
+             */
+            y.parseURI = y.memoize(function (str) {
+                var URI = {},
+                    origin,
+                    temp;
+                //scheme, only file can have ///
+                temp = /^([^:]+):\/\/[^\/]|(file):\/\/\/?/.exec(str);
+                if (temp) {
+                    origin += URI.scheme = (temp[1] || temp[2]).toLowerCase();
+                }
+                //file can't have, host, port, user or pass
+                if (URI.scheme !== 'file') {
+                    //[scheme]://(domain) or //(host) or host[:port]  or [user]:[pass]@(host)
+                    temp = /^([^:]+:)?\/\/([^@]+@)?([^:\/]+)/.exec(str) || /^[^@\/]+@([^:\/]+)/.exec(str) || /^([:\/]+):[1-9][0-9]*/.exec(str);
+                    if (temp) {
+                        origin += URI.host = (temp[2] || temp[1]).toLowerCase();
+                    }
+                    //port
+                    temp = /^(([^:]+:)?\/\/)?[^\/]+:([1-9][0-9]*)/.exec(str);
+                    if (temp) {
+                        URI.port = +temp[3];
+                        origin += ':' + URI.port;
+                    }
+                    //user &amp; pass
+                    temp = /^(([^:]+:)?\/\/)?([^\/@]+)@/.exec(str);
+                    if (temp) {
+                        origin = temp[3] + '@' + origin;
+                        temp = temp[3].split(':');
+                        if (temp.length > 1) {
+                            URI.pass = temp[1];
+                        }
+                        URI.user = temp[0];
+                    }
+                }
+                //path
+                if (origin) {
+                    str = str.substr(origin.length);
+                    URI.origin = origin;
+                }
+                //path, dir and file
+                temp = /([^?#]+)/.exec(str);
+                if (temp) {
+                    URI.path = temp = temp[1];
+                    temp = temp.split('/');
+                    if (temp[temp.length - 1] !== '') {
+                        URI.file = temp.pop();
+                        temp.push('');
+                    }
+                    URI.dir = temp.join('/');
+                }
+                //query
+                temp = /[^#?]*\?([^#]*)/.exec(str);
+                if (temp) {
+                    URI.query = temp[1];
+                }
+                //fragment
+                temp = /#(.*)/.exec();
+                if (temp) {
+                    URI.fragment = temp[1];
+                }
+                return URI;
+            });
             /**
              * Returns an array of a given object's own enumerable properties
              * @param  {Object} obj
@@ -571,11 +589,13 @@
                 return y;
             };
         }()),
+        //Core Y
+        VPy = Y(),
         /**
          * Events module
          * @module $/events
          */
-        Events = (function (y) {
+        Events = (function () {
             var validSubscribe = /^!?(\*$|[a-z]+)([a-z0-9]*\.([a-z0-9]+|\*$))*(@[0-9]+)?$/,
                 validPublish = /^[a-z]+([a-z0-9]*\.[a-z0-9]+)*(@[0-9]+)?$/;
             return function () {
@@ -618,7 +638,7 @@
                                 subs = subs.concat(subscribers['*']);
                             }
                             //start publishing
-                            y.each(subs, function (subscriber) {
+                            VPy.each(subs, function (subscriber) {
                                 if (!subscribers[1] || subscriber[1] === scope) {
                                     if (notAsync) {
                                         subscriber[0](data, originEvent);
@@ -665,7 +685,7 @@
                                 //add subscriber
                                 subscribers[parseEvnt].push([
                                     //bind thisArg with subscriber
-                                    y.bind(subscriber, y.merge({
+                                    VPy.bind(subscriber, VPy.merge({
                                         subscriber: subscriber
                                     }, thisArg)),
                                     scope,
@@ -682,7 +702,7 @@
                      * @param  {*}          [scope]    the scope if used by subscribing
                      */
                     unsub: function (evnt, subscriber, scope) {
-                        y.each(subscribers[evnt], function (sub, i) {
+                        VPy.each(subscribers[evnt], function (sub, i) {
                             if (sub[2] === subscriber &amp;&amp; (!sub[1] || sub[1] === scope)) {
                                 subscribers[evnt].splice(i, 1);
                             }
@@ -690,90 +710,14 @@
                     }
                 };
             };
-        }(Y())),
-        /**
-         * Core
-         */
-        Core = (function (Events, y) {
-            var config = {};
-            return function () {
-                /**
-                 * @exports $/core
-                 */
-                var coreApi = {
-                    /**
-                     * Current vp.js version
-                     * @type {Number}
-                     * @constant
-                     */
-                    VERSION: VERSION,
-                    /**
-                     * Current vp.js GIT version
-                     * @type {Number}
-                     * @constant
-                     */
-                    GIT_VERSION: GIT_VERSION,
-                    /**
-                     * @see {@link $/events~pub}
-                     * @method
-                     */
-                    pub: Events.pub,
-                    /**
-                     * @see {@link $/events~sub}
-                     * @method
-                     */
-                    sub: Events.sub,
-                    /**
-                     * @see {@link $/events~unsub}
-                     * @method
-                     */
-                    unsub: Events.unsub,
-                    /**
-                     * Get global configuration value
-                     * @param  {String} key
-                     * @return {*}          will return null if they key was not found
-                     */
-                    get: function (key) {
-                        if (config[key]) {
-                            return config[key].d;
-                        }
-                        return null;
-                    },
-                    /**
-                     * Set global configuration value
-                     * @param {String}  key
-                     * @param {Object}  value
-                     * @param {Number}  [opt=0] set configuration flags ( bitwise )
-                     *                          1= for merge old and new value @see $/y.merge
-                     *                          2= for protecting the value from getting overwritten
-                     * @return {$/core}
-                     */
-                    set: function (key, value, opt) {
-                        if (!config[key]) {
-                            config[key] = {
-                                d: value,
-                                o: opt || 0
-                            };
-                        } else {
-                            //if protected
-                            if (config[key].o &amp; 2) {
-                                return coreApi;
-                            }
-                            if (config[key].o &amp; 1 || opt &amp; 1) {
-                                y.merge(config[key].d, value, true);
-                            }
-                        }
-                        return coreApi;
-                    }
-                };
-                return coreApi;
-            };
-        }(Events(), Y())),
+        }()),
+        //Core Events
+        VPEvenst = Events(),
         /**
          * Queue
          * @module $/queue
          */
-        Queue = (function (y) {
+        Queue = (function () {
             return function () {
                 var queue = [],
                     running = FALSE,
@@ -824,7 +768,7 @@
                      * @method $/queue.pause
                      */
                     pause: function (state) {
-                        if (y.isBool(state)) {
+                        if (VPy.isBool(state)) {
                             paused = state;
                         } else {
                             paused = !paused;
@@ -836,19 +780,19 @@
                     }
                 });
             };
-        }(Y())),
+        }()),
         /**
          * Import script, CSS
          * @module $/import
          */
-        Import = (function (y, MQueue, MCore) {
+        Import = (function (MQueue) {
             var head = doc.head || doc.getElementsByTagName('head')[0] || NULL,
                 body = doc.body || doc.getElementsByTagName('body')[0];
             //pause queue
             MQueue.pause();
-            MCore.sub('!' + ns + '.ready', function () {
+            VPEvenst.sub('!' + ns + '.ready', function () {
                 MQueue.pause(false);
-                MCore.unsub('!' + ns + '.ready', this.subscriber);
+                VPEvenst.unsub('!' + ns + '.ready', this.subscriber);
             });
             //load script
             function script(url, callback) {
@@ -858,8 +802,8 @@
                 tag.type = 'text/javascript';
                 tag.src = url;
                 tag.async = TRUE;
-                if (y.isFunction(callback)) {
-                    callback = y.once(callback); //call callback only once
+                if (VPy.isFunction(callback)) {
+                    callback = VPy.once(callback); //call callback only once
                     tag.onreadystatechange = tag.onload = function () {
                         var state = tag.readyState;
                         if (!state || /loaded|complete/.test(state)) {
@@ -879,24 +823,24 @@
                      */
                     script: function (urls, callback) {
                         //if urls is a array of urls
-                        if (y.isArray(urls)) {
-                            y.each(urls, function (url) {
+                        if (VPy.isArray(urls)) {
+                            VPy.each(urls, function (url) {
                                 MQueue.push(script, [url, callback]);
                             });
                         }
                         //single url
-                        if (y.isString(urls)) {
+                        if (VPy.isString(urls)) {
                             MQueue.push(script, [urls, callback]);
                         }
                     }
                 };
             };
-        }(Y(), Queue(), Core())),
+        }(Queue())),
         /**
          * AMD loader
          * @module $/amd
          */
-        AMD = (function (y, MCore, MImport) {
+        AMD = (function (MImport) {
             var REFACTOR = 1,
                 loaded = {
                     '$/y' : {
@@ -913,9 +857,12 @@
                         factory: Import,
                         conf: REFACTOR
                     },
-                    '$/core': {
+                    '$/vp': {
                         init: FALSE,
-                        factory: Core,
+                        factory: function () {
+                            return VP();
+                        },
+                        deps: [],
                         conf: REFACTOR
                     },
                     '$/queue': {
@@ -930,16 +877,13 @@
                         },
                         deps: [],
                         conf: REFACTOR
-                    },
-                    '$/promise': {
-
                     }
                 },
                 requested = {},
                 waiting = {},
-                publish = MCore.pub,
-                subscribe = MCore.sub,
-                unsubscribe = MCore.unsub,
+                publish = VPEvenst.pub,
+                subscribe = VPEvenst.sub,
+                unsubscribe = VPEvenst.unsub,
                 evntModule = ns + '.amd.',
                 //default config
                 config = {
@@ -957,10 +901,10 @@
              * @return {Object}          {id: 'ns/moduleA', loadUrl: 'http://example.com/ns/moduleA.js'}
              */
             function parseId(id, basePath) {
-                var cacheBuster = config.cache === FALSE ? '?bust=' + y.now() : '',
+                var cacheBuster = config.cache === FALSE ? '?bust=' + VPy.now() : '',
                     idPath, URI, URIbase, relative, extension;
-                //is id not a  string 
-                if (!y.isString(id)) {
+                //is id not a  string
+                if (!VPy.isString(id)) {
                     return {
                         id: ''
                     };
@@ -973,7 +917,7 @@
                     };
                 }
                 //parse id
-                URI = y.parseURI(id);
+                URI = VPy.parseURI(id);
                 idPath = URI.dir;
                 //absolute URL / path
                 if (URI.origin || idPath.charAt(0) === '/') {
@@ -985,9 +929,9 @@
                 //if id path is relative we use base path else config.baseUrl
                 //else we use always config.baseUrl
                 if (id.charAt(0) === '.') {
-                    URIbase = y.parseURI(basePath || config.baseUrl);
+                    URIbase = VPy.parseURI(basePath || config.baseUrl);
                 } else {
-                    URIbase = y.parseURI(config.baseUrl);
+                    URIbase = VPy.parseURI(config.baseUrl);
                 }
                 basePath = URIbase.path;
                 // ./ns/module => ns/module
@@ -1048,7 +992,7 @@
                 //get ID if ID is defined, else set ID ( parse ID will than use the baseURL )
                 id = id ? parseId(id).id : FALSE;
                 //loop through the dependencies
-                y.each(deps, function (depId) {
+                VPy.each(deps, function (depId) {
                     var parsedId = parseId(depId, id);
                     depId = parsedId.id;
                     //module isn't loaded and requested
@@ -1085,18 +1029,18 @@
             }
             /**
              * Will register the module as loaded, will also trigger core.amd.module.loaded
-             * @param  {String}     id      [description]
-             * @param  {Array}      deps    [description]
-             * @param  {Function}   factory [description]
-             * @param  {Number}     conf    [description]
-             * @param  {Object}     scope   [description]
+             * @param  {String}     id      
+             * @param  {Array}      deps    
+             * @param  {Function}   factory 
+             * @param  {Number}     conf    
+             * @param  {*}          scope   
              */
             function registerModule(id, deps, factory, conf, scope) {
                 id = parseId(id).id;
                 if (loaded[id]) {
                     return; //error module already registered
                 }
-                if (y.isFunction(deps)) {
+                if (VPy.isFunction(deps)) {
                     loaded[id] = {
                         deps: [],
                         factory: deps,
@@ -1123,19 +1067,19 @@
              * @param  {Array}      deps        a array of dependencies
              * @param  {Function}   factory     the module factory
              * @param  {Number}     conf        module configuration bit
-             * @param  {Object}     scope       module scope
+             * @param  {*}          scope       module scope
              * @return {Objec}                  the result of the factory
              */
             function loadModule(deps, factory, conf, scope) {
                 //curry
-                if (y.isFunction(deps)) {
+                if (VPy.isFunction(deps)) {
                     scope = conf;
                     conf = factory;
                     factory = deps;
                     deps = [];
                 }
                 //load deps
-                y.each(deps, function (id, i) {
+                VPy.each(deps, function (id, i) {
                     var module = loaded[parseId(id).id],
                         liveModule = module.factory;
                     if (!module.init) {
@@ -1149,91 +1093,228 @@
                     deps[i] = liveModule;
                 });
                 //call factory
-                return factory.apply(scope || this, deps || []); // jshint ignore:line
+                return factory.apply(scope || undefined, deps || []); // jshint ignore:line
             }
+            //subscribe to config changed event
+            subscribe(ns + '.config.changed', function (key) {
+                //update config
+                if (key === '$/amd') {
+                    config = VPy.merge(config, VPconfig[key].d, true);
+                }
+            });
             //return the module
             return function () {
-                //merge config
-                config = y.merge(config, MCore.get('$/amd'), true);
                 return {
                     /**
-                     * REFACTOR bit [1]
-                     * Will re-factor every time when the module is request.
+                     * Will re-factor every time when the module is requested.
                      * @constant
-                     * @type {Number}
+                     * @default 1
+                     * @type {number}
                      */
                     REFACTOR: REFACTOR,
                     /**
                      * AMD define
-                     * @param {String|Array|Function}   id
-                     * @param {Array|Function}          deps
-                     * @param {Function}                factory
-                     * @param {Number}                  flags
-                     * @this  {root|$/core}
+                     * @param {string|Array|function}   id
+                     * @param {Array|function}          deps
+                     * @param {function}                factory
+                     * @param {number}                  flags
+                     * @param {*}                       scope
                      */
-                    def: function () {
-                        var arg = y.toArray(arguments),
-                            defaultScope = this;
+                    def: function (id, deps, factory, flags, scope) {
                         //if ID is a string we want to register a module
-                        if (y.isString(arg[0])) {
+                        if (VPy.isString(id)) {
                             //check dependencies
-                            if (y.isArray(arg[1]) &amp;&amp; getDependencies(arg[1], arg[0])) {
+                            if (VPy.isArray(deps) &amp;&amp; getDependencies(deps, id)) {
                                 //subscribe and wait when all modules are loaded
                                 subscribe(evntModule + 'loaded', function () {
-                                    if (!getDependencies(arg[1])) {
+                                    if (!getDependencies(deps)) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
-                                        registerModule.apply(defaultScope, arg);
+                                        registerModule(id, deps, factory, flags, scope);
                                     }
                                 });
                             } else {
                                 //register module
-                                registerModule.apply(defaultScope, arg);
+                                registerModule(id, deps, factory, flags, scope);
                             }
                         }
                         //load module with dependencies
-                        if (y.isArray(arg[0])) {
+                        if (VPy.isArray(id)) {
                             //check of we need to wait on dependencies
-                            if (getDependencies(arg[0])) {
+                            if (getDependencies(id)) {
                                 //subscribe and wait when all modules are loaded
                                 subscribe(evntModule + 'loaded', function () {
-                                    if (!getDependencies(arg[0])) {
+                                    if (!getDependencies(id)) {
                                         unsubscribe(evntModule + 'loaded', this.subscriber);
                                         //register module
-                                        loadModule.apply(defaultScope, arg);
+                                        loadModule(id, deps, factory, flags, scope);
                                     }
                                 });
                             } else {
-                                loadModule.apply(defaultScope, arg);
+                                loadModule(id, deps, factory, flags, scope);
                             }
                         }
                         //load module without dependencies
-                        if (y.isFunction(arg[0])) {
-                            loadModule.apply(defaultScope, arg);
+                        if (VPy.isFunction(id)) {
+                            loadModule(id, deps, factory, flags, scope);
                         }
                     }
                 };
             };
-        }(Y(), Core(), Import()));
+        }(Import())),
+        /**
+         * VP module
+         */
+        VP = (function () {
+            var publish = VPEvenst.pub,
+                subscribe = VPEvenst.sub,
+                unsubscribe = VPEvenst.unsub,
+                def = AMD().def;
+            return function () {
+                /**
+                 * @exports $/vp
+                 */
+                var coreApi = {
+                    /**
+                     * Current vp.js version
+                     * @type {Number}
+                     * @constant
+                     */
+                    VERSION: VERSION,
+                    /**
+                     * Current vp.js GIT version
+                     * @type {Number}
+                     * @constant
+                     */
+                    GIT_VERSION: GIT_VERSION,
+                    /**
+                     * @see {@link $/events~pub}
+                     * @method
+                     */
+                    pub: publish,
+                    /**
+                     * @see {@link $/events~sub}
+                     * @method
+                     */
+                    sub: subscribe,
+                    /**
+                     * @see {@link $/events~unsub}
+                     * @method
+                     */
+                    unsub: unsubscribe,
+                    /**
+                     * Get global configuration value
+                     * @param  {String} key
+                     * @return {*}          will return null if they key was not found
+                     */
+                    get: function (key) {
+                        if (VPconfig[key]) {
+                            return VPconfig[key].d;
+                        }
+                        return null;
+                    },
+                    /**
+                     * Set global configuration value
+                     * @param {String}  key
+                     * @param {Object}  value
+                     * @param {Number}  [opt=0] set configuration flags ( bitwise )
+                     *                          1= for merge old and new value @see $/y.merge
+                     *                          2= for protecting the value from getting overwritten
+                     * @return {$/core}
+                     */
+                    set: function (key, value, opt) {
+                        if (!VPconfig[key]) {
+                            VPconfig[key] = {
+                                d: value,
+                                o: opt || 0
+                            };
+                            publish(ns + '.config.changed', key);
+                        } else {
+                            //if protected
+                            if (VPconfig[key].o &amp; 2) {
+                                return coreApi;
+                            }
+                            if (VPconfig[key].o &amp; 1 || opt &amp; 1) {
+                                VPy.merge(VPconfig[key].d, value, true);
+                                publish(ns + '.config.changed', key);
+                            }
+                        }
+                        return coreApi;
+                    }
+                };
+                /**
+                 * Creates main vp.js interface
+                 * @param {(string|Array|function)} p1
+                 * @param {(object|Array|function)} p2
+                 * @param {(object|function)}       p3
+                 * @param {?number}                 p4
+                 */
+                return VPy.merge(function (p1, p2, p3, p4) {
+                    var prefix = /^(&lt;|>)(.*)/.exec(p1);
+                    /**
+                     * Subscribe once and publish in the same time.
+                     * Use this only with  Message broker rules
+                     */
+                    function subpub() {
+                        var evnt = p1,
+                            data = p2,
+                            subscriber = p3,
+                            scope = p3,
+                            id = VPy.now();
+                        //add id if need
+                        if (!VPy.has(evnt, '@')) {
+                            evnt += '@' + id;
+                        }
+                        //add subscriber
+                        if (VPy.isFunction(subscriber)) {
+                            subscribe(evnt, function () {
+                                unsubscribe(evnt, this.subscriber);
+                                subscriber.apply(this, arguments);
+                            }, scope);
+                        }
+                        //publish
+                        publish(evnt, data, scope);
+                    }
+                    //check of string is a event or we need to load a module
+                    if (prefix || VPy.isString(p1) &amp;&amp; !VPy.has(p1, '/')) {
+                        if (prefix) {
+                            //subscribe only
+                            switch (prefix[1]) {
+                                //subscribe only
+                                case '&lt;':
+                                    subscribe(prefix[2], p2, p3, VP());
+                                    break;
+                                //publish only
+                                case '>':
+                                    publish(prefix[2], p2, p3);
+                                    break;
+                            }
+                        } else {
+                            subpub();
+                        }
+                    } else {
+                        def(p1, p2, p3, p4);
+                    }
+                }, coreApi);
+            };
+        }());
     //bootstrap
-    (function (y) {
-        if (y.isArray(bootstrap)) {
-            y.each(bootstrap, function (elm) {
+    (function () {
+        if (VPy.isArray(bootstrap)) {
+            VPy.each(bootstrap, function (elm) {
                 //check of bootstrap elm is a function
-                if (y.isFunction(elm)) {
-                    elm(Core());
+                if (VPy.isFunction(elm)) {
+                    elm(VP());
                 }
             });
         }
-    }(Y()));
-    /**
-     * @param {Y}       y
-     * @param {AMD}     AMD
-     * @param {Core}    MCore
-     */
-    root[ns] = (function (y, AMD, MCore) {
-        var def = AMD.def;
+    }());
+    //create vpjs interface and define interface
+    (function (def) {
+        //only define, define if there is not another AMD loader already
         if (!root.define) {
+            //init
+            def = AMD().def;
             /**
              * AMD module loading via define
              * @param  {String|Array|Function}  id
@@ -1242,7 +1323,7 @@
              * @global
              */
             root.define = function (id, deps, factory) {
-                def.call(root, id, deps, factory);
+                def(id, deps, factory);
             };
         }
         /**
@@ -1269,84 +1350,35 @@
          * @param  {Object|Array|Function}  p2
          * @param  {Object|Function}        p3
          * @param  {Number}                 p4
-         * @return {vpjs}
          * @name vpjs
+         * @method 
          * @global
          */
-        return function (p1, p2, p3) {
-            var arg = y.toArray(arguments),
-                prefix = /^(&lt;|>)(.*)/.exec(p1);
-            /**
-             * Subscribe once and publish in the same time.
-             * Use this only with  Message broker rules
-             */
-            function subpub() {
-                var evnt = p1,
-                    data = p2,
-                    subscriber = p3,
-                    scope = p3,
-                    id = y.now();
-                //add id if need
-                if (!y.has(evnt, '@')) {
-                    evnt += '@' + id;
-                }
-                //add subscriber
-                if (y.isFunction(subscriber)) {
-                    MCore.sub(evnt, function () {
-                        MCore.unsub(evnt, this.subscriber);
-                        subscriber.apply(this, arguments);
-                    }, scope);
-                }
-                //publish
-                MCore.pub(evnt, data, scope);
-            }
-            //check of string is a event or we need to load a module
-            if (prefix || y.isString(arg[0]) &amp;&amp; !y.has(arg[0], '/')) {
-                if (prefix) {
-                    //subscribe only
-                    switch (prefix[1]) {
-                        //subscribe only
-                        case '&lt;':
-                            MCore.sub(prefix[2], p2, p3, Core());
-                            break;
-                        //publish only
-                        case '>':
-                            MCore.pub(prefix[2], p2, p3);
-                            break;
-                    }
-                } else {
-                    subpub();
-                }
-            } else {
-                def.apply(Core(), arg);
-            }
-        };
-    }(Y(), AMD(), Core()));
+        root[ns] = VP();
+    }());
     //async
-    (function (api, y) {
+    (function (api) {
         //async API only needed if core is loaded for that async is defined
         api.push = function () {
             api.apply(root, arguments);
         };
         //execute async calls
-        if (y.isFunction(async)) {
-            y.each(async(), function (call) {
+        if (VPy.isFunction(async)) {
+            VPy.each(async(), function (call) {
                 api.apply(root, call);
             });
         }
-    }(root[ns], Y()));
+    }(root[ns]));
     /**
      * Cross browser DOM ready
      * Will publish ns + '.ready' if DOM content is loaded.
-     * @param  {Events.pub} publish [description]
-     * @param  {Y.once}     once    [description]
      */
-    (function (publish, once) {
+    (function () {
         var isFrame,
             //onready
-            ready = once(function () {
+            ready = VPy.once(function () {
                 //publish event
-                publish(ns + '.ready', [VERSION, GIT_VERSION]);
+                VPEvenst.pub(ns + '.ready', [VERSION, GIT_VERSION]);
             }),
             //try scroll for IE
             tryScroll = function () {
@@ -1391,7 +1423,7 @@
                 win.onload = ready;
             }
         }
-    }(Core().pub, Y().once));
+    }());
 }(this, this.__VPJSNS__ || 'vpjs', this.__VPJSBOOTSTRAP__ || []));</code></pre>
         </article>
     </section>
@@ -1402,13 +1434,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="amd.html">$/amd</a></li><li><a href="core.html">$/core</a></li><li><a href="events.html">$/events</a></li><li><a href="import.html">$/import</a></li><li><a href="queue.html">$/queue</a></li><li><a href="y.html">$/y</a></li></ul><h3>Global</h3><ul><li><a href="global.html#__VPJSBOOTSTRAP__">__VPJSBOOTSTRAP__</a></li><li><a href="global.html#__VPJSNS__">__VPJSNS__</a></li><li><a href="global.html#define">define</a></li><li><a href="global.html#vpjs">vpjs</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="amd.html">$/amd</a></li><li><a href="events.html">$/events</a></li><li><a href="import.html">$/import</a></li><li><a href="queue.html">$/queue</a></li><li><a href="vp.html">$/vp</a></li><li><a href="y.html">$/y</a></li></ul><h3>Global</h3><ul><li><a href="global.html#__VPJSBOOTSTRAP__">__VPJSBOOTSTRAP__</a></li><li><a href="global.html#__VPJSNS__">__VPJSNS__</a></li><li><a href="global.html#define">define</a></li><li><a href="global.html#vpjs">vpjs</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Wed Mar 05 2014 17:09:32 GMT+0100 (W. Europe Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Sun Mar 09 2014 09:16:08 GMT+0100 (W. Europe Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

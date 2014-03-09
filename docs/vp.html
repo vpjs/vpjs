@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: $/queue</title>
+    <title>JSDoc: Module: $/vp</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Module: $/queue</h1>
+    <h1 class="page-title">Module: $/vp</h1>
     
     
 
@@ -27,7 +27,7 @@
     
 <header>
     <h2>
-    $/queue
+    $/vp
     </h2>
     
 </header>  
@@ -38,8 +38,6 @@
     
     
         
-            <div class="description">Queue</div>
-        
         
         
 <dl class="details">
@@ -64,7 +62,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line689">line 689</a>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1150">line 1150</a>
     </li></ul></dd>
     
     
@@ -90,6 +88,138 @@
     
     
     
+    
+        <h3 class="subsection-title">Members</h3>
+        
+        <dl>
+            
+<dt>
+    <h4 class="name" id="GIT_VERSION"><span class="type-signature">&lt;static, constant> </span>GIT_VERSION<span class="type-signature"> :Number</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Current vp.js GIT version
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1162">line 1162</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="VERSION"><span class="type-signature">&lt;static, constant> </span>VERSION<span class="type-signature"> :Number</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Current vp.js version
+    </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1156">line 1156</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        </dl>
     
     
     
@@ -98,7 +228,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="next"><span class="type-signature">&lt;static> </span>next<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="queue.html">$/queue</a>}</span></h4>
+    <h4 class="name" id="get"><span class="type-signature">&lt;static> </span>get<span class="signature">(key)</span><span class="type-signature"> &rarr; {*}</span></h4>
     
     
 </dt>
@@ -106,94 +236,7 @@
     
     
     <div class="description">
-        Next item in the queue
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line731">line 731</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="queue.html">$/queue</a></span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="pause"><span class="type-signature">&lt;static> </span>pause<span class="signature">(<span class="optional">state</span>)</span><span class="type-signature"> &rarr; {<a href="queue.html">$/queue</a>}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Pause the the queue
+        Get global configuration value
     </div>
     
 
@@ -215,8 +258,6 @@
 		<th>Type</th>
 		
 		
-		<th>Argument</th>
-		
 		
 		
 		
@@ -229,33 +270,23 @@
 	
         <tr>
             
-                <td class="name"><code>state</code></td>
+                <td class="name"><code>key</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">String</span>
 
 
             
             </td>
             
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                    
-                
-                </td>
             
             
             
-            
-            <td class="description last">true for pause, false for unpause, if not set it will toggle the current pause state</td>
+            <td class="description last"></td>
         </tr>
 	
 	
@@ -286,7 +317,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line737">line 737</a>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1183">line 1183</a>
     </li></ul></dd>
     
     
@@ -310,6 +341,10 @@
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    will return null if they key was not found
+</div>
+
 
 
 <dl>
@@ -318,7 +353,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="queue.html">$/queue</a></span>
+<span class="param-type">*</span>
 
 
 	</dd>
@@ -332,7 +367,79 @@
         
             
 <dt>
-    <h4 class="name" id="push"><span class="type-signature">&lt;static> </span>push<span class="signature">(call, <span class="optional">arg</span>, <span class="optional">opt</span>, <span class="optional">thisArg</span>)</span><span class="type-signature"> &rarr; {<a href="queue.html">$/queue</a>}</span></h4>
+    <h4 class="name" id="pub"><span class="type-signature">&lt;static> </span>pub<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1167">line 1167</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="events.html#pub">$/events~pub</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="set"><span class="type-signature">&lt;static> </span>set<span class="signature">(key, value, <span class="optional">opt</span>)</span><span class="type-signature"> &rarr; {$/core}</span></h4>
     
     
 </dt>
@@ -340,7 +447,7 @@
     
     
     <div class="description">
-        Push a call in the queue
+        Set global configuration value
     </div>
     
 
@@ -378,13 +485,13 @@
 	
         <tr>
             
-                <td class="name"><code>call</code></td>
+                <td class="name"><code>key</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">String</span>
 
 
             
@@ -406,20 +513,20 @@
                 </td>
             
             
-            <td class="description last">call that you want queue</td>
+            <td class="description last"></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>arg</code></td>
+                <td class="name"><code>value</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Array</span>
+<span class="param-type">Object</span>
 
 
             
@@ -427,8 +534,6 @@
             
             
                 <td class="attributes">
-                
-                    &lt;optional><br>
                 
                     
                 
@@ -443,7 +548,7 @@
                 </td>
             
             
-            <td class="description last">array of arguments that have to be send to the call if it's called</td>
+            <td class="description last"></td>
         </tr>
 	
 	
@@ -482,44 +587,7 @@
                 </td>
             
             
-            <td class="description last">bitwise options</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>thisArg</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                    
-                
-                </td>
-            
-            
-            
-                <td class="default">
-                
-                </td>
-            
-            
-            <td class="description last"></td>
+            <td class="description last">set configuration flags ( bitwise )                         1= for merge old and new value @see $/y.merge                         2= for protecting the value from getting overwritten</td>
         </tr>
 	
 	
@@ -550,7 +618,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line715">line 715</a>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1198">line 1198</a>
     </li></ul></dd>
     
     
@@ -582,13 +650,157 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="queue.html">$/queue</a></span>
+<span class="param-type">$/core</span>
 
 
 	</dd>
 </dl>
 
         
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="sub"><span class="type-signature">&lt;static> </span>sub<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1172">line 1172</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="events.html#sub">$/events~sub</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="unsub"><span class="type-signature">&lt;static> </span>unsub<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1177">line 1177</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="events.html#unsub">$/events~unsub</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
     
     
 </dd>
@@ -615,7 +827,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Sun Mar 09 2014 09:16:08 GMT+0100 (W. Europe Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Sun Mar 09 2014 09:16:09 GMT+0100 (W. Europe Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

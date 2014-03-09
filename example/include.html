@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>vp.js - example - include</title>
+    <script type="text/javascript">
+         //ASYNC include code
+        var vpjs = function (a){return function(){a.push(arguments);return a}}(vpjs||[]),
+            //bootstrap
+            __VPJSBOOTSTRAP__ = [function (vp) {
+                vp.sub('*', function () {
+                    console.log(this, arguments);
+                });
+                vp.set('$/amd', {
+                    baseUrl: '../src/module/',
+                    cache: false
+                });
+            }];
+    </script>
+</head>
+<body>
+    <!-- javascript  //-->
+    <script type="text/javascript">
+        (function (doc) {
+            var include = doc.createElement('script'),
+                target = doc.getElementsByTagName('script')[0];
+            include.src = '../src/vp.js';
+            include.async = !0;
+            include.type = 'text/javascript';
+            // if (window.console && console.profile) {
+            //     console.profile();
+            //     include.onreadystatechange = include.onload = function () {
+            //         var state = include.readyState;
+            //         if (!state || /loaded|complete/.test(state)) {
+            //             console.profileEnd();
+            //         }
+            //     };
+            // }
+            target.parentNode.insertBefore(include, target);
+        }(document));
+    </script>
+</body>
+</html>
