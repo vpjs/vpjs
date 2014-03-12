@@ -5,10 +5,10 @@
  * @license (@link ../LICENSE} GNU GENERAL PUBLIC LICENSE v2
  */
 /**
- * You can change the namespace via __VPJSNS__, all core events will start with you defined namespace and not with vpjs
+ * You can change the namespace via __VPJSNS__, all core events will start with you defined namespace and not with 'vp'
  * @name __VPJSNS__
  * @type {?string}
- * @default vpjs
+ * @default vp
  * @global
  */
 /**
@@ -46,6 +46,7 @@
             var proArr = Array.prototype,
                 proObj = Object.prototype,
                 nForEach = proArr.forEach,
+                nIndexOf = proArr.indexOf,
                 nBind = Function.prototype.bind,
                 nKeys = proObj.keys,
                 toString = proObj.toString,
@@ -241,6 +242,48 @@
                 };
             });
             /**
+             * Array.indexOf shim
+             * @param  {Array}  arr             Array to search in
+             * @param  {*}      needed          Element to search for
+             * @param  {number} [fromIndex=0]   Index to start
+             * @return {number} returns the first index at which a given element can be found in the array, or -1 if it is not present.
+             * @method $/y.indexOf
+             */
+            y.indexOf = function (arr, needed, fromIndex) {
+                var length;
+                //first parameter must be a array
+                if (!isArray(arr)) {
+                    return -1;
+                }
+                //native Array.indexOf
+                if (nIndexOf && arr.indexOf === nIndexOf) {
+                    return arr.indexOf(needed, fromIndex);
+                }
+                //UInt32
+                length = arr.length >>> 0;
+                //from index must be a int, else default to 0
+                fromIndex = +fromIndex || 0;
+                //Infinity check
+                if (Math.abs(fromIndex) === Infinity) {
+                    fromIndex = 0;
+                }
+                //negative int
+                if (fromIndex < 0) {
+                    fromIndex += length;
+                    if (fromIndex < 0) {
+                        fromIndex = 0;
+                    }
+                }
+                //start search
+                for (;fromIndex < length; fromIndex++) {
+                    if (this[fromIndex] === needed) {
+                        return fromIndex;
+                    }
+                }
+                //return -1 if not found
+                return -1;
+            };
+            /**
             * Has the first parameter the needed value?
             * By a string and array it will search in the string for the needed value
             * By a number it will check of the first parameter is bigger or equal than the needed number
@@ -328,8 +371,8 @@
                 var cache = {};
                 //set default hasher
                 hasher = hasher || function () {
-                   return y.toArray(arguments);
-                }
+                    return y.toArray(arguments);
+                };
                 //new function
                 return function () {
                     var key = hasher.apply(this, arguments);
@@ -338,8 +381,9 @@
                         return cache[key];
                     }
                     //run function and cache result
-                    return cache[key] = func.apply(this, arguments);
-                }
+                    cache[key] = func.apply(this, arguments);
+                    return cache[key];
+                };
             };
             /**
              * Parse a URI and return its components
@@ -1220,7 +1264,7 @@
                  * @param {(string|Array|function)} p1
                  * @param {(object|Array|function)} p2
                  * @param {(object|function)}       p3
-                 * @param {?number}                 p4
+                 * @param {(number|*)}              p4
                  */
                 return VPy.merge(function (p1, p2, p3, p4) {
                     var prefix = /^(<|>)(.*)/.exec(p1);
@@ -1230,16 +1274,22 @@
                      */
                     function subpub() {
                         var evnt = p1,
+                            id = VPy.now(),
                             data = p2,
                             subscriber = p3,
-                            scope = p3,
-                            id = VPy.now();
-                        //add id if need
-                        if (!VPy.has(evnt, '@')) {
-                            evnt += '@' + id;
+                            scope = p4;
+                        //without data
+                        if (VPy.isFunction(p2)) {
+                            data = NULL;
+                            subscriber = p2;
+                            scope = p3;
                         }
                         //add subscriber
                         if (VPy.isFunction(subscriber)) {
+                            //add id if need
+                            if (!VPy.has(evnt, '@')) {
+                                evnt += '@' + id;
+                            }
                             subscribe(evnt, function () {
                                 unsubscribe(evnt, this.subscriber);
                                 subscriber.apply(this, arguments);
@@ -1282,7 +1332,7 @@
             });
         }
     }());
-    //create vpjs interface and define interface
+    //create vp.js interface and define interface
     (function (def) {
         //only define, define if there is not another AMD loader already
         if (!root.define) {
@@ -1304,27 +1354,26 @@
          * The behavior can be deferent, base on the first parameter
          * @example
          * //String
-         * vpjs('event'); // will publish a event
-         * vpjs('event', {}); // will publish a event with data
-         * vpjs('event', function () {}); //@todo
-         * vpjs('event', {}, function () {}); //@todo
-         * vpjs('>event'); //{@link $/events~pub}
-         * vpjs('<event', function(){}); //{@link $/events~sub}
+         * vp('event'); // will publish a event
+         * vp('event', {}); // will publish a event with data
+         * vp('event', function () {}); //@todo
+         * vp('event', {}, function () {}); //@todo
+         * vp('>event'); //{@link $/events~pub}
+         * vp('<event', function(){}); //{@link $/events~sub}
          * //String contains a path
-         * vpjs('ns/module', function() {}); //{@link $/amd~def}
+         * vp('ns/module', function() {}); //{@link $/amd~def}
          * @example
          * //Array
-         * vpjs(['Module']); //{@link $/amd~def}
-         * vpjs(['Module'], function () {}); //{@link $/amd~def}
+         * vp(['Module']); //{@link $/amd~def}
+         * vp(['Module'], function () {}); //{@link $/amd~def}
          * @example
          * //Function
-         * vpjs(function(){}); //{@link $/amd~def}
-         * @param  {String|Array|Function}  p1
-         * @param  {Object|Array|Function}  p2
-         * @param  {Object|Function}        p3
-         * @param  {Number}                 p4
-         * @name vpjs
-         * @method 
+         * vp(function(){}); //{@link $/amd~def}
+         * @param  {string|Array|function}  p1
+         * @param  {Object|Array|function}  [p2]
+         * @param  {Object|function}        [p3]
+         * @param  {number|*}               [p4]
+         * @name vp
          * @global
          */
         root[ns] = VP();
@@ -1397,4 +1446,4 @@
             }
         }
     }());
-}(this, this.__VPJSNS__ || 'vpjs', this.__VPJSBOOTSTRAP__ || []));
+}(this, this.__VPJSNS__ || 'vp', this.__VPJSBOOTSTRAP__ || []));
