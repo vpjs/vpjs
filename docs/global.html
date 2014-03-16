@@ -224,69 +224,6 @@
     
 </dd>
 
-        
-            
-<dt>
-    <h4 class="name" id="vp"><span class="type-signature"></span>vp<span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Core vp.js interfaceThe behavior can be deferent, base on the first parameter
-    </div>
-    
-    
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1352">line 1352</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-        <h5>Examples</h5>
-        
-    <pre class="prettyprint"><code>//Stringvp('event'); // will publish a eventvp('event', {}); // will publish a event with datavp('event', function () {}); //@todovp('event', {}, function () {}); //@todovp('>event'); //<a href="events.html#pub">$/events~pub</a>vp('&lt;event', function(){}); //<a href="events.html#sub">$/events~sub</a>//String contains a pathvp('ns/module', function() {}); //<a href="amd.html#def">$/amd~def</a></code></pre>
-
-    <pre class="prettyprint"><code>//Arrayvp(['Module']); //<a href="amd.html#def">$/amd~def</a>vp(['Module'], function () {}); //<a href="amd.html#def">$/amd~def</a></code></pre>
-
-    <pre class="prettyprint"><code>//Functionvp(function(){}); //<a href="amd.html#def">$/amd~def</a></code></pre>
-
-    
-</dd>
-
         </dl>
     
     
@@ -465,6 +402,259 @@
     
 </dd>
 
+        
+            
+<dt>
+    <h4 class="name" id="vp"><span class="type-signature"></span>vp<span class="signature">(p1, <span class="optional">p2</span>, <span class="optional">p3</span>, <span class="optional">p4</span>)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Core vp.js interfaceThe behavior can be deferent, base on the first parameter
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>p1</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>p2</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>p3</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>p4</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">*</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="vp.js.html">vp.js</a>, <a href="vp.js.html#line1352">line 1352</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>//Stringvp('event'); // will publish a eventvp('event', {}); // will publish a event with datavp('event', function () {}); //@todovp('event', {}, function () {}); //@todovp('>event'); //<a href="events.html#pub">$/events~pub</a>vp('&lt;event', function(){}); //<a href="events.html#sub">$/events~sub</a>//String contains a pathvp('ns/module', function() {}); //<a href="amd.html#def">$/amd~def</a></code></pre>
+
+    <pre class="prettyprint"><code>//Arrayvp(['Module']); //<a href="amd.html#def">$/amd~def</a>vp(['Module'], function () {}); //<a href="amd.html#def">$/amd~def</a></code></pre>
+
+    <pre class="prettyprint"><code>//Functionvp(function(){}); //<a href="amd.html#def">$/amd~def</a></code></pre>
+
+    
+</dd>
+
         </dl>
     
     
@@ -487,7 +677,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Wed Mar 12 2014 21:31:08 GMT+0100 (W. Europe Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Fri Mar 14 2014 11:24:33 GMT+0100 (W. Europe Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

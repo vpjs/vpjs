@@ -613,8 +613,8 @@
          * @module $/events
          */
         Events = (function () {
-            var validSubscribe = /^!?(\*$|[a-z]+)([a-z0-9]*\.([a-z0-9]+|\*$))*(@[0-9]+)?$/,
-                validPublish = /^[a-z]+([a-z0-9]*\.[a-z0-9]+)*(@[0-9]+)?$/;
+            var validSubscribe = /^!?(\*$|[a-z])([a-z0-9]*)(\.([a-z0-9]+|\*$))*(@[0-9]+)?$/,
+                validPublish = /^[a-z]([a-z0-9]*)(\.[a-z0-9]+)*(@[0-9]+)?$/;
             return function () {
                 var subscribers = {};
                 return {
@@ -1374,6 +1374,7 @@
          * @param  {Object|function}        [p3]
          * @param  {number|*}               [p4]
          * @name vp
+         * @method
          * @global
          */
         root[ns] = VP();
