@@ -1,9 +1,23 @@
 /**
  * vp.js
- * IMPORTANT this project is still in draft.
- * @author Victor Perez
- * @license (@link ../LICENSE} GNU GENERAL PUBLIC LICENSE v2
+ * Copyright (c) 2014, V.A. Perez, All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
  */
+
+/*##### IMPORTANT this project is still in draft. #####*/
+
 /**
  * You can change the namespace via __VPJSNS__, all core events will start with you defined namespace and not with 'vp'
  * @name __VPJSNS__
@@ -40,9 +54,9 @@
         VPconfig = {},
         /**
          * Utility module
-         * @module $/y
+         * @module $/v
          */
-        Y = (function () {
+        V = (function () {
             var proArr = Array.prototype,
                 proObj = Object.prototype,
                 nForEach = proArr.forEach,
@@ -51,13 +65,13 @@
                 nKeys = proObj.keys,
                 toString = proObj.toString,
                 slice = proArr.slice,
-                y = {
+                v = {
                     /**
                     * Is a given value a object?
                     * @param  {*}       obj
                     * @param  {Boolaen} [literal=false] Check of object is a literal object
                     * @return {Boolean}
-                    * @method $/y.isObject
+                    * @method $/v.isObject
                     */
                     isObject: function (obj, literal) {
                         return Object(obj) === obj && (!literal || obj.constructor === Object);
@@ -66,7 +80,7 @@
                     * Is a given value a regular expression?
                     * @param  {*} obj
                     * @return {Boolean}
-                    * @method $/y.isRegex
+                    * @method $/v.isRegex
                     */
                     isRegex: function (obj) {
                         return obj && (obj.ignoreCase || obj.ignoreCase === FALSE) && obj.test && obj.exec;
@@ -75,7 +89,7 @@
                      * Is given value undefined?
                      * @param  {*} obj
                      * @return {Boolean}
-                     * @method $/y.isUndefined
+                     * @method $/v.isUndefined
                      */
                     isUndefined: function (obj) {
                         return obj === void 0;
@@ -84,16 +98,25 @@
                     * Is a given value a boolean?
                     * @param  {*} obj
                     * @return {Boolean}
-                    * @method $/y.isBool
+                    * @method $/v.isBool
                     */
                     isBool: function (obj) {
                         return obj === TRUE || obj === FALSE || toString.call(obj) === '[object Boolean]';
                     },
                     /**
+                     * Is a given value null?
+                     * @param  {*}  obj
+                     * @return {Boolean}
+                     * @method $/v.isNull
+                     */
+                    isNull: function (obj) {
+                        return obj === NULL;
+                    },
+                    /**
                     * Is a given value a DOM element?
                     * @param  {*} obj
                     * @return {Boolean}
-                    * @method $/y.isElement
+                    * @method $/v.isElement
                     */
                     isElement: function (obj) {
                         return !!(obj && obj.nodeType === 1);
@@ -102,7 +125,7 @@
                      * After that it will return the result of this call
                      * @param  {Function} func
                      * @return {Function}
-                     * @method $/y.once
+                     * @method $/v.once
                      */
                     once: function (func) {
                         var test = FALSE,
@@ -122,7 +145,7 @@
                      * @param  {*} obj1
                      * @param  {*} obj2
                      * @return {Boolean}
-                     * @method $/y.is
+                     * @method $/v.is
                      */
                     is: proObj.is || function (obj1, obj2) {
                         //Check 0 and -0
@@ -139,7 +162,7 @@
                     /**
                      * Date.now shim
                      * @return {Number} number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
-                     * @method $/y.now
+                     * @method $/v.now
                      */
                     now: Date.now || function () {
                         return (+new Date());
@@ -149,9 +172,9 @@
                  * Is given value an Array?
                  * @param  {*} obj
                  * @return {Boolean}
-                 * @method $/y.isArray
+                 * @method $/v.isArray
                  */
-                isArray = y.isArray = proArr.isArray || function (obj) {
+                isArray = v.isArray = proArr.isArray || function (obj) {
                     return toString.call(obj) === '[object Array]';
                 },
                 /**
@@ -159,18 +182,18 @@
                  * @param  {Object} obj
                  * @param  {String} key
                  * @return {Boolean}
-                 * @method $/y.hasop
+                 * @method $/v.hasop
                  */
-                hasop = y.hasop = function (obj, key) {
+                hasop = v.hasop = function (obj, key) {
                     return obj.hasOwnProperty(key);
                 },
                 /**
                  * Is given value a Arguments object
                  * @param  {*} obj
                  * @return {Boolean}
-                 * @method $/y.isArguments
+                 * @method $/v.isArguments
                  */
-                isArguments = y.isArguments = (function () {
+                isArguments = v.isArguments = (function () {
                     function test(obj) {
                         return toString.call(obj) === '[object Arguments]';
                     }
@@ -188,11 +211,11 @@
                  * @param  {Array|Arguments|Object} obj
                  * @param  {Function}               callback
                  * @param  {*}                      [thisArg]
-                 * @method $/y.each
+                 * @method $/v.each
                  */
-                each = y.each = function (obj, callback, thisArg) {
+                each = v.each = function (obj, callback, thisArg) {
                     //null we can't interate that
-                    if (obj === null || y.isUndefined(obj)) {
+                    if (obj === null || v.isUndefined(obj)) {
                         return;
                     }
                     //array with native support
@@ -216,28 +239,28 @@
              * is given value a function
              * @param  {*} obj
              * @return {Boolean}
-             * @method $/y.isFunction
+             * @method $/v.isFunction
              */
             /**
              * is given value a string
              * @param  {*} obj
              * @return {Boolean}
-             * @method $/y.isString
+             * @method $/v.isString
              */
             /**
              * is given value a number
              * @param  {*} obj
              * @return {Boolean}
-             * @method $/y.isNumber
+             * @method $/v.isNumber
              */
             /**
              * is given value a Date object
              * @param  {*} obj
              * @return {Boolean}
-             * @method $/y.isDate
+             * @method $/v.isDate
              */
             each(['Function', 'String', 'Number', 'Date'], function (is) {
-                y['is' + is] = function (obj) {
+                v['is' + is] = function (obj) {
                     return toString.call(obj) === '[object ' + is + ']';
                 };
             });
@@ -247,9 +270,9 @@
              * @param  {*}      needed          Element to search for
              * @param  {number} [fromIndex=0]   Index to start
              * @return {number} returns the first index at which a given element can be found in the array, or -1 if it is not present.
-             * @method $/y.indexOf
+             * @method $/v.indexOf
              */
-            y.indexOf = function (arr, needed, fromIndex) {
+            v.indexOf = function (arr, needed, fromIndex) {
                 var length;
                 //first parameter must be a array
                 if (!isArray(arr)) {
@@ -290,32 +313,32 @@
             * By a object it will check of the object has needed property
             * By everything else it will compare the 2 both parameters and if they are the same it will return true.
             * @example
-            * Y.has("test", "e"); //will return true
-            * Y.has([1], 1); //will return true
-            * Y.has({x:1}, "x"); //will return true
-            * Y.has(null, null); //will return true
-            * Y.has(10, 5); //will return true
+            * V.has("test", "e"); //will return true
+            * V.has([1], 1); //will return true
+            * V.has({x:1}, "x"); //will return true
+            * V.has(null, null); //will return true
+            * V.has(10, 5); //will return true
             * @param  {*}       obj
             * @param  {*}       needed
             * @return {Boolean}
-            * @method $/y.has
+            * @method $/v.has
             */
-            y.has = function (obj, needed) {
+            v.has = function (obj, needed) {
                 //Has the string needed string ?
-                if (y.isString(obj)) {
+                if (v.isString(obj)) {
                     return !!~obj.indexOf(needed);
                 }
                 //Has array needed element?
-                if (y.isArray(obj)) {
-                    return !!~y.indexOf(obj, needed);
+                if (v.isArray(obj)) {
+                    return !!~v.indexOf(obj, needed);
                 }
                 //Has number the needed number
-                if (y.isNumber(obj)) {
+                if (v.isNumber(obj)) {
                     return obj >= needed;
                 }
                 //Has object needed property
-                if (y.isObject(obj)) {
-                    return y.hasop(obj, needed);
+                if (v.isObject(obj)) {
+                    return v.hasop(obj, needed);
                 }
                 //if null, undefined if they are equal they
                 return obj === needed;
@@ -323,23 +346,23 @@
             /**
             * Convert anything to a Array.
             * @example
-            * Y.toArray("test") //will return ["t","e","s","t"]
-            * Y.toArray({a:1}) //will return [1]
-            * Y.toArray({a:1}, true) //will return ['a'], same as Y.key
-            * Y.toArray(null) //will return [null]
+            * V.toArray("test") //will return ["t","e","s","t"]
+            * V.toArray({a:1}) //will return [1]
+            * V.toArray({a:1}, true) //will return ['a'], same as V.key
+            * V.toArray(null) //will return [null]
             * @param  {*}        obj
             * @param  {Bolean}   [keys=false] can be used by a object to return the keys instead of the values
             * @return {Array}
-            * @method $/y.toArray
+            * @method $/v.toArray
             */
-            y.toArray = function (obj, keys) {
+            v.toArray = function (obj, keys) {
                 var temp = [];
                 //Arguments to Array
                 if (isArguments(obj)) {
                     return slice.call(obj);
                 }
                 //String to Array
-                if (y.isString(obj)) {
+                if (v.isString(obj)) {
                     return obj.split('');
                 }
                 //Array to Array
@@ -347,7 +370,7 @@
                     return slice.call(obj);
                 }
                 //Object to Array
-                if (y.isObject(obj)) {
+                if (v.isObject(obj)) {
                     //if keys is true and Object.keys is supported use Object.keys
                     if (keys && nKeys) {
                         return nKeys(obj);
@@ -365,13 +388,13 @@
              * @param  {function} func      function where from you want to memorize the result
              * @param  {function} [hasher]  hasher function, default it will hash the parameters
              * @return {function}
-             * @method $/y.memoize
+             * @method $/v.memoize
              */
-            y.memoize = function (func, hasher) {
+            v.memoize = function (func, hasher) {
                 var cache = {};
                 //set default hasher
                 hasher = hasher || function () {
-                    return y.toArray(arguments);
+                    return JSON.stringify(arguments);
                 };
                 //new function
                 return function () {
@@ -404,9 +427,9 @@
              * }
              * @param  {String} str
              * @return {Object}
-             * @method $/y.parseURI
+             * @method $/v.parseURI
              */
-            y.parseURI = y.memoize(function (str) {
+            v.parseURI = v.memoize(function (str) {
                 var URI = {},
                     origin,
                     temp;
@@ -471,17 +494,17 @@
              * Returns an array of a given object's own enumerable properties
              * @param  {Object} obj
              * @return {Array}
-             * @method $/y.keys
+             * @method $/v.keys
              */
-            y.keys = nKeys || function (obj) {
-                if (!y.isObject(obj)) {
+            v.keys = nKeys || function (obj) {
+                if (!v.isObject(obj)) {
                     throw new TypeError(obj + ' is not an object');
                 }
-                return y.toArray(obj, true);
+                return v.toArray(obj, true);
             };
             /**
              * Will merge all parameters based on the type of the first parameter.
-             * If the first parameter is a Array then it will treat all other parameters as a Array by using Y.toArray
+             * If the first parameter is a Array then it will treat all other parameters as a Array by using V.toArray
              * If the first parameter is a Object it will extend this object with the other objects
              * All other types will be merge to 1 single string
              * IF the first parameter is a Object and the last parameter is a boolean it will do a deep merge of all the object objects,
@@ -494,33 +517,33 @@
              * @param   {...*}                  items
              * @param   {Boolean}               [deep=false]
              * @return  {Array|Object|String}
-             * @method $/y.merge
+             * @method $/v.merge
              */
-            y.merge = function () {
-                var arg = y.toArray(arguments),
+            v.merge = function () {
+                var arg = v.toArray(arguments),
                     obj1 = arg.shift(),
                     deep = arg[arg.length - 1] === TRUE ? TRUE : FALSE;
-                if (y.isObject(obj1) && deep) {
+                if (v.isObject(obj1) && deep) {
                     arg.pop();
                 }
                 //array
                 if (isArray(obj1)) {
                     each(arg, function (arr) {
-                        obj1 = obj1.concat(y.toArray(arr));
+                        obj1 = obj1.concat(v.toArray(arr));
                     });
                     return obj1;
                 }
                 //Object
-                if (y.isObject(obj1)) {
+                if (v.isObject(obj1)) {
                     each(arg, function (obj) {
                         //check of parameter is a object, else change it to a empty object
-                        if (!y.isObject(obj)) {
+                        if (!v.isObject(obj)) {
                             obj = {};
                         }
                         each(obj, function (value, key) {
                             //deep
-                            if (deep && y.isObject(obj1[key])) {
-                                y.merge(obj1[key], value, true);
+                            if (deep && v.isObject(obj1[key])) {
+                                v.merge(obj1[key], value, true);
                             } else {
                                 obj1[key] = value;
                             }
@@ -537,9 +560,9 @@
              * undefined, null, false, 0, "0", "", NaN and {} are empty values
              * @param  {*} obj
              * @return {Boolean}
-             * @method $/y.empty
+             * @method $/v.empty
              */
-            y.empty = function (obj) {
+            v.empty = function (obj) {
                 var str;
                 //undefined, null, false, 0 and ''
                 if (!obj) {
@@ -556,11 +579,11 @@
                 //shouldn't happen but if someone used new [Type]
                 str = '' + obj; //to string
                 //new String and new Number
-                if (y.isString(obj) || y.isNumber(obj)) {
+                if (v.isString(obj) || v.isNumber(obj)) {
                     return str === '' || str === '0';
                 }
                 //new Boolean()
-                if (y.isBool(obj)) {
+                if (v.isBool(obj)) {
                     return str === 'false';
                 }
                 //object
@@ -577,16 +600,16 @@
              * @param  {*}          thisArg     'this' to bind
              * @param  {...*}       [params]    params that you want to bind
              * @return {Function}               bound function
-             * @method $/y.bind
+             * @method $/v.bind
              */
-            y.bind = function (func, thisArg) {
+            v.bind = function (func, thisArg) {
                 var args, bound, fcon;
                 //native bind
                 if (nBind && func.bind === nBind) {
                     return nBind.apply(func, slice.call(arguments, 1));
                 }
                 //check of fist func is a function
-                if (!y.isFunction(func)) {
+                if (!v.isFunction(func)) {
                     throw new TypeError();
                 }
                 //arguments that we want to bind
@@ -595,7 +618,7 @@
                 //bound function
                 bound = function () {
                     var self = this instanceof fcon && thisArg ? this : thisArg;
-                    return func.apply(self, args.concat(y.toArray(arguments)));
+                    return func.apply(self, args.concat(v.toArray(arguments)));
                 };
                 //bound constructor
                 fcon.prototype = func.prototype;
@@ -603,11 +626,11 @@
                 return bound;
             };
             return function () {
-                return y;
+                return v;
             };
         }()),
-        //Core Y
-        VPy = Y(),
+        //Core V
+        VPv = V(),
         /**
          * Events module
          * @module $/events
@@ -655,7 +678,7 @@
                                 subs = subs.concat(subscribers['*']);
                             }
                             //start publishing
-                            VPy.each(subs, function (subscriber) {
+                            VPv.each(subs, function (subscriber) {
                                 if (!subscribers[1] || subscriber[1] === scope) {
                                     if (notAsync) {
                                         subscriber[0](data, originEvent);
@@ -702,7 +725,7 @@
                                 //add subscriber
                                 subscribers[parseEvnt].push([
                                     //bind thisArg with subscriber
-                                    VPy.bind(subscriber, VPy.merge({
+                                    VPv.bind(subscriber, VPv.merge({
                                         subscriber: subscriber
                                     }, thisArg)),
                                     scope,
@@ -719,7 +742,7 @@
                      * @param  {*}          [scope]    the scope if used by subscribing
                      */
                     unsub: function (evnt, subscriber, scope) {
-                        VPy.each(subscribers[evnt], function (sub, i) {
+                        VPv.each(subscribers[evnt], function (sub, i) {
                             if (sub[2] === subscriber && (!sub[1] || sub[1] === scope)) {
                                 subscribers[evnt].splice(i, 1);
                             }
@@ -785,7 +808,7 @@
                      * @method $/queue.pause
                      */
                     pause: function (state) {
-                        if (VPy.isBool(state)) {
+                        if (VPv.isBool(state)) {
                             paused = state;
                         } else {
                             paused = !paused;
@@ -797,6 +820,166 @@
                     }
                 });
             };
+        }()),
+        /**
+         * P module ( Promise module )
+         * @return {$/p}
+         * @module $/p
+         */
+        P = (function () {
+            var UNRESOLVED = "unresolved",
+                HAS_REJECTION = "has-rejection",
+                HAS_RESOLUTION  = "has-resolution";
+            function isThenable(obj) {
+                return VPv.hasop(obj, 'then');
+            }
+            /**
+             * @param {function} executor
+             * @method $/p.prototype.constructor
+             * @return {$/p}
+             */
+            function Pconstructor(executor) {
+                var state = UNRESOLVED,
+                    queue = Queue(),
+                    p = {},
+                    value;
+                /**
+                 * Update the state and value/reason  of the promise
+                 * @param  {string} newState
+                 * @param  {*}      newValue value/reason
+                 */
+                function updateState(newState, newValue) {
+                    if (state === UNRESOLVED) {
+                        state = newState;
+                        value = newValue;
+                        queue.pause(FALSE);
+                    }
+                }
+                /**
+                 * Then method
+                 * @param  {Function} onFulfilled
+                 * @param  {Function} onRejected
+                 * @return {$/p}
+                 */
+                function then(onFulfilled, onRejected) {
+                    onFulfilled = onFulfilled || Pconstructor.resolve;
+                    onRejected = onRejected || function (reason) {
+                            return Pconstructor(function (fulfill, reject) {
+                                reject(reason);
+                            });
+                        };
+                    return Pconstructor(function (fulfill, reject) {
+                        queue.push(function () {
+                            if (isThenable(value) && state === UNRESOLVED) {
+                                value.then(onFulfilled, onRejected).then(fulfill, reject);
+                            } else {
+                                try {
+                                    //has resolution
+                                    if (state === HAS_RESOLUTION) {
+                                        fulfill(onFulfilled(value));
+                                    } else {
+                                        fulfill(onRejected(value));
+                                    }
+                                } catch (reason) {
+                                    reject(reason);
+                                }
+                            }
+                        });
+                    });
+                }
+                if (!VPv.isFunction(executor)) {
+                    throw new TypeError('executor is not callable');
+                }
+                //pause queue
+                queue.pause(TRUE);
+                //add static methods
+                VPv.tick(function () {
+                    try {
+                        executor.call(p,
+                            VPv.bind(updateState, p, HAS_RESOLUTION),
+                            VPv.bind(updateState, p, HAS_REJECTION)
+                        );
+                    } catch (reason) {
+                        updateState(HAS_REJECTION, reason);
+                    }
+                });
+                return VPv.create({
+                    /**
+                     * Then method
+                     * @param  {Function} [onFulfilled]
+                     * @param  {Function} [onRejected]
+                     * @method $/p.prototype.then
+                     * @return {$/p}
+                    */
+                    then: then,
+                    /**
+                     * Catch rejections
+                     * @param  {Function} [onRejected]
+                     * @method $/p.prototype.catch
+                     * @return {$/p}
+                     */
+                    'catch': VPv.bind(then, p, NULL),
+                    /**
+                     * Get / set state
+                     * @param  {string} [newState]
+                     * @method  $/p.prototype.state
+                     * @return {string}
+                     */
+                    state: function (newState) {
+                        if (state === UNRESOLVED && (newState === HAS_REJECTION || newState === HAS_RESOLUTION)) {
+                            state = newState;
+                        }
+                        return state;
+                    }
+                });
+            }
+            return VPv.extend(Pconstructor, {
+                /**
+                 * Return a promise that is resolved
+                 * @param  {*} value
+                 * @method  $/p.resolve
+                 * @return {$/p}
+                 */
+                resolve: function (value) {
+                    return Pconstructor(function (onFulfilled, onRejected) {
+                        if (isThenable(value)) {
+                            value.then(onFulfilled, onRejected);
+                        } else {
+                            onFulfilled(value);
+                        }
+                    });
+                },
+                /**
+                 * Returns a promise that is fulfilled
+                 * @param  {*} value
+                 * @method  $/p.fulfill
+                 * @return {$/p}
+                 */
+                fulfill: function (value) {
+                    return Pconstructor(function (onFulfilled) {
+                        this.state(HAS_RESOLUTION);
+                        onFulfilled(value);
+                    });
+                },
+                /**
+                 * Returns a promise that is rejected
+                 * @param  {*} reason
+                 * @method  $/p.reject
+                 * @return {$/p}
+                 */
+                reject: function (reason) {
+                    return Pconstructor(function (x, onRejected) {
+                        this.state(HAS_REJECTION);
+                        onRejected(reason);
+                    });
+                },
+                all: function () {
+
+                },
+                race: function () {
+
+                }
+            });
         }()),
         /**
          * Import script, CSS
@@ -819,8 +1002,8 @@
                 tag.type = 'text/javascript';
                 tag.src = url;
                 tag.async = TRUE;
-                if (VPy.isFunction(callback)) {
-                    callback = VPy.once(callback); //call callback only once
+                if (VPv.isFunction(callback)) {
+                    callback = VPv.once(callback); //call callback only once
                     tag.onreadystatechange = tag.onload = function () {
                         var state = tag.readyState;
                         if (!state || /loaded|complete/.test(state)) {
@@ -840,13 +1023,13 @@
                      */
                     script: function (urls, callback) {
                         //if urls is a array of urls
-                        if (VPy.isArray(urls)) {
-                            VPy.each(urls, function (url) {
+                        if (VPv.isArray(urls)) {
+                            VPv.each(urls, function (url) {
                                 MQueue.push(script, [url, callback]);
                             });
                         }
                         //single url
-                        if (VPy.isString(urls)) {
+                        if (VPv.isString(urls)) {
                             MQueue.push(script, [urls, callback]);
                         }
                     }
@@ -860,14 +1043,18 @@
         AMD = (function (MImport) {
             var REFACTOR = 1,
                 loaded = {
-                    '$/y' : {
+                    '$/v' : {
                         init: TRUE,
-                        factory: Y()
+                        factory: V()
                     },
                     '$/events': {
                         init: FALSE,
                         factory: Events,
                         conf: REFACTOR
+                    },
+                    '$/p' : {
+                        init: TRUE,
+                        factory: P()
                     },
                     '$/import': {
                         init: FALSE,
@@ -918,10 +1105,10 @@
              * @return {Object}          {id: 'ns/moduleA', loadUrl: 'http://example.com/ns/moduleA.js'}
              */
             function parseId(id, basePath) {
-                var cacheBuster = config.cache === FALSE ? '?bust=' + VPy.now() : '',
+                var cacheBuster = config.cache === FALSE ? '?bust=' + VPv.now() : '',
                     idPath, URI, URIbase, relative, extension;
                 //is id not a  string
-                if (!VPy.isString(id)) {
+                if (!VPv.isString(id)) {
                     return {
                         id: ''
                     };
@@ -934,7 +1121,7 @@
                     };
                 }
                 //parse id
-                URI = VPy.parseURI(id);
+                URI = VPv.parseURI(id);
                 idPath = URI.dir;
                 //absolute URL / path
                 if (URI.origin || idPath.charAt(0) === '/') {
@@ -946,9 +1133,9 @@
                 //if id path is relative we use base path else config.baseUrl
                 //else we use always config.baseUrl
                 if (id.charAt(0) === '.') {
-                    URIbase = VPy.parseURI(basePath || config.baseUrl);
+                    URIbase = VPv.parseURI(basePath || config.baseUrl);
                 } else {
-                    URIbase = VPy.parseURI(config.baseUrl);
+                    URIbase = VPv.parseURI(config.baseUrl);
                 }
                 basePath = URIbase.path;
                 // ./ns/module => ns/module
@@ -1009,7 +1196,7 @@
                 //get ID if ID is defined, else set ID ( parse ID will than use the baseURL )
                 id = id ? parseId(id).id : FALSE;
                 //loop through the dependencies
-                VPy.each(deps, function (depId) {
+                VPv.each(deps, function (depId) {
                     var parsedId = parseId(depId, id);
                     depId = parsedId.id;
                     //module isn't loaded and requested
@@ -1046,18 +1233,18 @@
             }
             /**
              * Will register the module as loaded, will also trigger core.amd.module.loaded
-             * @param  {String}     id      
-             * @param  {Array}      deps    
-             * @param  {Function}   factory 
-             * @param  {Number}     conf    
-             * @param  {*}          scope   
+             * @param  {String}     id
+             * @param  {Array}      deps
+             * @param  {Function}   factory
+             * @param  {Number}     conf
+             * @param  {*}          scope
              */
             function registerModule(id, deps, factory, conf, scope) {
                 id = parseId(id).id;
                 if (loaded[id]) {
                     return; //error module already registered
                 }
-                if (VPy.isFunction(deps)) {
+                if (VPv.isFunction(deps)) {
                     loaded[id] = {
                         deps: [],
                         factory: deps,
@@ -1089,14 +1276,14 @@
              */
             function loadModule(deps, factory, conf, scope) {
                 //curry
-                if (VPy.isFunction(deps)) {
+                if (VPv.isFunction(deps)) {
                     scope = conf;
                     conf = factory;
                     factory = deps;
                     deps = [];
                 }
                 //load deps
-                VPy.each(deps, function (id, i) {
+                VPv.each(deps, function (id, i) {
                     var module = loaded[parseId(id).id],
                         liveModule = module.factory;
                     if (!module.init) {
@@ -1116,7 +1303,7 @@
             subscribe(ns + '.config.changed', function (key) {
                 //update config
                 if (key === '$/amd') {
-                    config = VPy.merge(config, VPconfig[key].d, true);
+                    config = VPv.merge(config, VPconfig[key].d, true);
                 }
             });
             //return the module
@@ -1139,9 +1326,9 @@
                      */
                     def: function (id, deps, factory, flags, scope) {
                         //if ID is a string we want to register a module
-                        if (VPy.isString(id)) {
+                        if (VPv.isString(id)) {
                             //check dependencies
-                            if (VPy.isArray(deps) && getDependencies(deps, id)) {
+                            if (VPv.isArray(deps) && getDependencies(deps, id)) {
                                 //subscribe and wait when all modules are loaded
                                 subscribe(evntModule + 'loaded', function () {
                                     if (!getDependencies(deps)) {
@@ -1156,7 +1343,7 @@
                             }
                         }
                         //load module with dependencies
-                        if (VPy.isArray(id)) {
+                        if (VPv.isArray(id)) {
                             //check of we need to wait on dependencies
                             if (getDependencies(id)) {
                                 //subscribe and wait when all modules are loaded
@@ -1172,7 +1359,7 @@
                             }
                         }
                         //load module without dependencies
-                        if (VPy.isFunction(id)) {
+                        if (VPv.isFunction(id)) {
                             loadModule(id, deps, factory, flags, scope);
                         }
                     }
@@ -1235,7 +1422,7 @@
                      * @param {String}  key
                      * @param {Object}  value
                      * @param {Number}  [opt=0] set configuration flags ( bitwise )
-                     *                          1= for merge old and new value @see $/y.merge
+                     *                          1= for merge old and new value @see $/v.merge
                      *                          2= for protecting the value from getting overwritten
                      * @return {$/core}
                      */
@@ -1252,7 +1439,7 @@
                                 return coreApi;
                             }
                             if (VPconfig[key].o & 1 || opt & 1) {
-                                VPy.merge(VPconfig[key].d, value, true);
+                                VPv.merge(VPconfig[key].d, value, true);
                                 publish(ns + '.config.changed', key);
                             }
                         }
@@ -1266,7 +1453,7 @@
                  * @param {(object|function)}       p3
                  * @param {(number|*)}              p4
                  */
-                return VPy.merge(function (p1, p2, p3, p4) {
+                return VPv.merge(function (p1, p2, p3, p4) {
                     var prefix = /^(<|>)(.*)/.exec(p1);
                     /**
                      * Subscribe once and publish in the same time.
@@ -1274,20 +1461,20 @@
                      */
                     function subpub() {
                         var evnt = p1,
-                            id = VPy.now(),
+                            id = VPv.now(),
                             data = p2,
                             subscriber = p3,
                             scope = p4;
                         //without data
-                        if (VPy.isFunction(p2)) {
+                        if (VPv.isFunction(p2)) {
                             data = NULL;
                             subscriber = p2;
                             scope = p3;
                         }
                         //add subscriber
-                        if (VPy.isFunction(subscriber)) {
+                        if (VPv.isFunction(subscriber)) {
                             //add id if need
-                            if (!VPy.has(evnt, '@')) {
+                            if (!VPv.has(evnt, '@')) {
                                 evnt += '@' + id;
                             }
                             subscribe(evnt, function () {
@@ -1299,7 +1486,7 @@
                         publish(evnt, data, scope);
                     }
                     //check of string is a event or we need to load a module
-                    if (prefix || VPy.isString(p1) && !VPy.has(p1, '/')) {
+                    if (prefix || VPv.isString(p1) && !VPv.has(p1, '/')) {
                         if (prefix) {
                             //subscribe only
                             switch (prefix[1]) {
@@ -1323,10 +1510,10 @@
         }());
     //bootstrap
     (function () {
-        if (VPy.isArray(bootstrap)) {
-            VPy.each(bootstrap, function (elm) {
+        if (VPv.isArray(bootstrap)) {
+            VPv.each(bootstrap, function (elm) {
                 //check of bootstrap elm is a function
-                if (VPy.isFunction(elm)) {
+                if (VPv.isFunction(elm)) {
                     elm(VP());
                 }
             });
@@ -1386,8 +1573,8 @@
             api.apply(root, arguments);
         };
         //execute async calls
-        if (VPy.isFunction(async)) {
-            VPy.each(async(), function (call) {
+        if (VPv.isFunction(async)) {
+            VPv.each(async(), function (call) {
                 api.apply(root, call);
             });
         }
@@ -1399,7 +1586,7 @@
     (function () {
         var isFrame,
             //onready
-            ready = VPy.once(function () {
+            ready = VPv.once(function () {
                 //publish event
                 VPEvenst.pub(ns + '.ready', [VERSION, GIT_VERSION]);
             }),
