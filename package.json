@@ -1,0 +1,10 @@
+{
+  "name": "vp.js",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-jsdoc": "latest",
+    "grunt-contrib-clean": "latest",
+    "grunt-contrib-watch": "latest"
+  }
+}
