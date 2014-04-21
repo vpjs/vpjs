@@ -63,14 +63,15 @@
                 nIndexOf = proArr.indexOf,
                 nBind = Function.prototype.bind,
                 nKeys = proObj.keys,
+                nMap = proObj.map,
                 toString = proObj.toString,
                 slice = proArr.slice,
                 v = {
                     /**
                     * Is a given value a object?
                     * @param  {*}       obj
-                    * @param  {Boolaen} [literal=false] Check of object is a literal object
-                    * @return {Boolean}
+                    * @param  {boolean} [literal=false] Check of object is a literal object
+                    * @return {boolean}
                     * @method $/v.isObject
                     */
                     isObject: function (obj, literal) {
@@ -79,7 +80,7 @@
                     /**
                     * Is a given value a regular expression?
                     * @param  {*} obj
-                    * @return {Boolean}
+                    * @return {boolean}
                     * @method $/v.isRegex
                     */
                     isRegex: function (obj) {
@@ -88,7 +89,7 @@
                     /**
                      * Is given value undefined?
                      * @param  {*} obj
-                     * @return {Boolean}
+                     * @return {boolean}
                      * @method $/v.isUndefined
                      */
                     isUndefined: function (obj) {
@@ -97,7 +98,7 @@
                     /**
                     * Is a given value a boolean?
                     * @param  {*} obj
-                    * @return {Boolean}
+                    * @return {boolean}
                     * @method $/v.isBool
                     */
                     isBool: function (obj) {
@@ -106,7 +107,7 @@
                     /**
                      * Is a given value null?
                      * @param  {*}  obj
-                     * @return {Boolean}
+                     * @return {boolean}
                      * @method $/v.isNull
                      */
                     isNull: function (obj) {
@@ -115,7 +116,7 @@
                     /**
                     * Is a given value a DOM element?
                     * @param  {*} obj
-                    * @return {Boolean}
+                    * @return {boolean}
                     * @method $/v.isElement
                     */
                     isElement: function (obj) {
@@ -144,7 +145,7 @@
                      * Object.is shim
                      * @param  {*} obj1
                      * @param  {*} obj2
-                     * @return {Boolean}
+                     * @return {boolean}
                      * @method $/v.is
                      */
                     is: proObj.is || function (obj1, obj2) {
@@ -161,7 +162,7 @@
                     },
                     /**
                      * Date.now shim
-                     * @return {Number} number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
+                     * @return {number} number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
                      * @method $/v.now
                      */
                     now: Date.now || function () {
@@ -171,7 +172,7 @@
                 /**
                  * Is given value an Array?
                  * @param  {*} obj
-                 * @return {Boolean}
+                 * @return {boolean}
                  * @method $/v.isArray
                  */
                 isArray = v.isArray = proArr.isArray || function (obj) {
@@ -190,7 +191,7 @@
                 /**
                  * Is given value a Arguments object
                  * @param  {*} obj
-                 * @return {Boolean}
+                 * @return {boolean}
                  * @method $/v.isArguments
                  */
                 isArguments = v.isArguments = (function () {
@@ -238,25 +239,25 @@
             /**
              * is given value a function
              * @param  {*} obj
-             * @return {Boolean}
+             * @return {boolean}
              * @method $/v.isFunction
              */
             /**
              * is given value a string
              * @param  {*} obj
-             * @return {Boolean}
+             * @return {boolean}
              * @method $/v.isString
              */
             /**
              * is given value a number
              * @param  {*} obj
-             * @return {Boolean}
+             * @return {boolean}
              * @method $/v.isNumber
              */
             /**
              * is given value a Date object
              * @param  {*} obj
-             * @return {Boolean}
+             * @return {boolean}
              * @method $/v.isDate
              */
             each(['Function', 'String', 'Number', 'Date'], function (is) {
@@ -320,7 +321,7 @@
             * V.has(10, 5); //will return true
             * @param  {*}       obj
             * @param  {*}       needed
-            * @return {Boolean}
+            * @return {boolean}
             * @method $/v.has
             */
             v.has = function (obj, needed) {
@@ -351,7 +352,7 @@
             * V.toArray({a:1}, true) //will return ['a'], same as V.key
             * V.toArray(null) //will return [null]
             * @param  {*}        obj
-            * @param  {Bolean}   [keys=false] can be used by a object to return the keys instead of the values
+            * @param  {boolean}   [keys=false] can be used by a object to return the keys instead of the values
             * @return {Array}
             * @method $/v.toArray
             */
@@ -385,9 +386,9 @@
             };
             /**
              * Memorize results of an expensive function
-             * @param  {function} func      function where from you want to memorize the result
-             * @param  {function} [hasher]  hasher function, default it will hash the parameters
-             * @return {function}
+             * @param  {Function} func      function where from you want to memorize the result
+             * @param  {Function} [hasher]  hasher function, default it will hash the parameters
+             * @return {Function}
              * @method $/v.memoize
              */
             v.memoize = function (func, hasher) {
@@ -425,7 +426,7 @@
              *     query: 'arg1=2&arg2=1',
              *     fragment: 'hashvalue'
              * }
-             * @param  {String} str
+             * @param  {string} str
              * @return {Object}
              * @method $/v.parseURI
              */
@@ -515,8 +516,8 @@
              * merge({x:{y:2}}, {x:{z:1}}, true)// will result in  {x:{y:2,z:1}}
              * @param   {Array|Object|*}        target
              * @param   {...*}                  items
-             * @param   {Boolean}               [deep=false]
-             * @return  {Array|Object|String}
+             * @param   {boolean}               [deep=false]
+             * @return  {Array|Object|string}
              * @method $/v.merge
              */
             v.merge = function () {
@@ -559,7 +560,7 @@
              * Is a given value empty?
              * undefined, null, false, 0, "0", "", NaN and {} are empty values
              * @param  {*} obj
-             * @return {Boolean}
+             * @return {boolean}
              * @method $/v.empty
              */
             v.empty = function (obj) {
@@ -593,6 +594,30 @@
                     }
                 }
                 return TRUE;
+            };
+            /**
+             * Array.map shim, that also supports objects
+             * @param  {Array|Object|*}     obj
+             * @param  {Function} callback
+             * @param  {*}   thisArg
+             * @return {Array|Object}
+             * @method $/v.map
+             */
+            v.map = function (obj, callback, thisArg) {
+                var result = isArray(obj) ? [] : {};
+                //use native map method if supported
+                if (nMap && obj.map === nMap) {
+                    return obj.map(callback, thisArg);
+                }
+                //if not a array or object, return a empty array
+                if (!isArray(obj) || !v.isObject(obj)) {
+                    return [];
+                }
+                each(obj, function (value, key) {
+                    result[key] = callback.call(thisArg, value, key, obj);
+                });
+                //return result
+                return result;
             };
             /**
              * Function.bind shim, will delegate to native Function.bind if supported
@@ -643,10 +668,10 @@
                 return {
                     /**
                      * Publish a event
-                     * @param  {String}     evnt                The event that you want to publish
+                     * @param  {string}     evnt                The event that you want to publish
                      * @param  {*}          [data]              Data that you want to send along with the event
                      * @param  {*}          [scope]             Event scope
-                     * @param  {Boolean}    [notAsync=false]    Events are default asynchronous, but in some cases yo don't want that
+                     * @param  {boolean}    [notAsync=false]    Events are default asynchronous, but in some cases yo don't want that
                      */
                     pub: function (evnt, data, scope, notAsync) {
                         var evntPart = '',
@@ -702,7 +727,7 @@
                      *     '1a' the first character can't be a number
                      *     'a.' name space can't be empty
                      *     'a#$' a event can't have other characters than a-z or 0-9
-                     * @param {String}     evnt       The event where you want to subscribe
+                     * @param {string}     evnt       The event where you want to subscribe
                      * @param {Function}   subscriber The subscriber to the events
                      * @param {*}          [scope]    Scope can be used to only subscribe to events that are in that scope
                      * @param {*}          [thisArg]  The `this` scope  of the subscriber
@@ -737,7 +762,7 @@
                     },
                     /**
                      * Unsubscribe a subscriber from a event
-                     * @param  {String}     evnt       Event where from you want to unsubscribe
+                     * @param  {string}     evnt       Event where from you want to unsubscribe
                      * @param  {Function}   subscriber the subscriber
                      * @param  {*}          [scope]    the scope if used by subscribing
                      */
@@ -783,7 +808,7 @@
                      * Push a call in the queue
                      * @param  {Function}   call        call that you want queue
                      * @param  {Array}      [arg]       array of arguments that have to be send to the call if it's called
-                     * @param  {Number}     [opt=0]     bitwise options
+                     * @param  {number}     [opt=0]     bitwise options
                      * @param  {Object}     [thisArg]
                      * @return {$/queue}
                      * @method  $/queue.push
@@ -803,7 +828,7 @@
                     next: next,
                     /**
                      * Pause the the queue
-                     * @param  {Boolean}    [state] true for pause, false for unpause, if not set it will toggle the current pause state
+                     * @param  {boolean}    [state] true for pause, false for unpause, if not set it will toggle the current pause state
                      * @return {$/queue}
                      * @method $/queue.pause
                      */
@@ -823,8 +848,6 @@
         }()),
         /**
          * P module ( Promise module )
-         * @return {$/p}
-         * @module $/p
          */
         P = (function () {
             var UNRESOLVED = "unresolved",
@@ -834,9 +857,9 @@
                 return VPv.hasop(obj, 'then');
             }
             /**
-             * @param {function} executor
-             * @method $/p.prototype.constructor
-             * @return {$/p}
+             * @param {Function} executor
+             * @constructor $/p
+             * @module  $/p
              */
             function Pconstructor(executor) {
                 var state = UNRESOLVED,
@@ -862,12 +885,13 @@
                  * @return {$/p}
                  */
                 function then(onFulfilled, onRejected) {
-                    onFulfilled = onFulfilled || Pconstructor.resolve;
+                    onFulfilled = onFulfilled || Pconstructor.cast;
                     onRejected = onRejected || function (reason) {
                             return Pconstructor(function (fulfill, reject) {
                                 reject(reason);
                             });
                         };
+                    //return promise
                     return Pconstructor(function (fulfill, reject) {
                         queue.push(function () {
                             if (isThenable(value) && state === UNRESOLVED) {
@@ -887,13 +911,14 @@
                         });
                     });
                 }
+                //check of executor is a function
                 if (!VPv.isFunction(executor)) {
                     throw new TypeError('executor is not callable');
                 }
                 //pause queue
                 queue.pause(TRUE);
-                //add static methods
-                VPv.tick(function () {
+                //run promise always async
+                setTimeout(function () {
                     try {
                         executor.call(p,
                             VPv.bind(updateState, p, HAS_RESOLUTION),
@@ -902,8 +927,8 @@
                     } catch (reason) {
                         updateState(HAS_REJECTION, reason);
                     }
-                });
-                return VPv.create({
+                }, 0);
+                return /** @lends $/p.prototype **/ {
                     /**
                      * Then method
                      * @param  {Function} [onFulfilled]
@@ -922,7 +947,7 @@
                     /**
                      * Get / set state
                      * @param  {string} [newState]
-                     * @method  $/p.prototype.state
+                     * @method $/p.prototype.state
                      * @return {string}
                      */
                     state: function (newState) {
@@ -931,29 +956,14 @@
                         }
                         return state;
                     }
-                });
+                };
             }
-            return VPv.extend(Pconstructor, {
-                /**
-                 * Return a promise that is resolved
-                 * @param  {*} value
-                 * @method  $/p.resolve
-                 * @return {$/p}
-                 */
-                resolve: function (value) {
-                    return Pconstructor(function (onFulfilled, onRejected) {
-                        if (isThenable(value)) {
-                            value.then(onFulfilled, onRejected);
-                        } else {
-                            onFulfilled(value);
-                        }
-                    });
-                },
+            return VPv.merge(Pconstructor, {
                 /**
                  * Returns a promise that is fulfilled
                  * @param  {*} value
-                 * @method  $/p.fulfill
                  * @return {$/p}
+                 * @method $/p.fulfill
                  */
                 fulfill: function (value) {
                     return Pconstructor(function (onFulfilled) {
@@ -964,8 +974,8 @@
                 /**
                  * Returns a promise that is rejected
                  * @param  {*} reason
-                 * @method  $/p.reject
                  * @return {$/p}
+                 * @method $/p.reject
                  */
                 reject: function (reason) {
                     return Pconstructor(function (x, onRejected) {
@@ -973,8 +983,55 @@
                         onRejected(reason);
                     });
                 },
-                all: function () {
-
+                /**
+                 * Will cast given value to a promise if the give value is not thenible
+                 * @param  {*} value
+                 * @return {$/p}
+                 * @method $/p.cast
+                 */
+                cast: function (value) {
+                    return Pconstructor(function (onFulfilled, onRejected) {
+                        if (isThenable(value)) {
+                            value.then(onFulfilled, onRejected);
+                        } else {
+                            onFulfilled(value);
+                        }
+                    });
+                },
+                /**
+                 * Returns a promise that resolves when all of the promises in iterable have resolved.
+                 * The result of all promises will be returned as an array if the promise is resolved
+                 * The promise will immediately rejects with the value of the promise that rejected
+                 * @param  {Array|...*} iterable
+                 * @return {$/p}
+                 * @method $/p.all
+                 */
+                all: function (iterable) {
+                    return Pconstructor(function (onFulfilled, onRejected) {
+                        var result = [];
+                        //store the value in the result array
+                        function then(index, value) {
+                            result[index] = value;
+                        }
+                        //reject promise
+                        function reject(reason) {
+                            i = max; //kill the loop
+                            onRejected(reason);
+                        }
+                        //check of iterable is a Array
+                        if (!VPv.isArray(iterable) || !VPv.isUndefined(arguments[1])) {
+                            iterable = VPv.toArray(arguments);
+                        }
+                        for (var i = 0, max = iterable.length; i < max; i++) {
+                            //if not thenable, cast value
+                            if (!isThenable(iterable[i])) {
+                                iterable[i] = Pconstructor.cast(iterable[i]);
+                            }
+                            //get  value of rejection reason
+                            iterable[i].then(VPv.bind(then, this, i), reject);
+                        }
+                        onFulfilled(result);
+                    });
                 },
                 race: function () {
 
@@ -992,7 +1049,7 @@
             MQueue.pause();
             VPEvenst.sub('!' + ns + '.ready', function () {
                 MQueue.pause(false);
-                VPEvenst.unsub('!' + ns + '.ready', this.subscriber);
+                VPEvenst.unsub(ns + '.ready', this.subscriber);
             });
             //load script
             function script(url, callback) {
@@ -1018,20 +1075,29 @@
                 return {
                     /**
                      * Load a script async
-                     * @param  {String|Array}   url      script url
-                     * @param  {Function}       callback callback if script is loaded
+                     * @param  {string|Array}   url      script url
+                     * @return {$/p}
                      */
-                    script: function (urls, callback) {
-                        //if urls is a array of urls
-                        if (VPv.isArray(urls)) {
-                            VPv.each(urls, function (url) {
-                                MQueue.push(script, [url, callback]);
-                            });
-                        }
-                        //single url
-                        if (VPv.isString(urls)) {
-                            MQueue.push(script, [urls, callback]);
-                        }
+                    script: function (urls) {
+                        return P(function (onFulfilled, onRejected) {
+                            //if urls is a array of urls
+                            if (VPv.isArray(urls)) {
+                                MQueue.push(function (urls) {
+                                    //run all urls
+                                    P.all(VPv.map(urls, function (item) {
+                                        //make promise
+                                        return P(function (f, r) {
+                                            script(item, f, r);
+                                        });
+                                    }))
+                                    .then(onFulfilled, onRejected);
+                                }, urls);
+                            }
+                            //single url
+                            if (VPv.isString(urls)) {
+                                MQueue.push(script, [urls, onFulfilled, onRejected]);
+                            }
+                        });
                     }
                 };
             };
@@ -1054,7 +1120,7 @@
                     },
                     '$/p' : {
                         init: TRUE,
-                        factory: P()
+                        factory: P
                     },
                     '$/import': {
                         init: FALSE,
@@ -1100,8 +1166,8 @@
              * @see https://github.com/amdjs/amdjs-api/wiki/AMD#module-id-format-
              * Beside that it support some requireJS ID's
              * @todo fix extension and cache buster if url already has a query
-             * @param  {String} id       The module ID e.q: 'ns/testA', './ns/testA', '../ns/testA' or full URL 'http://example.com/ns/testA.js'
-             * @param  {String} basePath Will be used to find the correct dependencies path
+             * @param  {string} id       The module ID e.q: 'ns/testA', './ns/testA', '../ns/testA' or full URL 'http://example.com/ns/testA.js'
+             * @param  {string} basePath Will be used to find the correct dependencies path
              * @return {Object}          {id: 'ns/moduleA', loadUrl: 'http://example.com/ns/moduleA.js'}
              */
             function parseId(id, basePath) {
@@ -1187,8 +1253,8 @@
             /**
              * get dependencies from module requested
              * @param  {Array}      deps    a array of dependencies for the current module
-             * @param  {String}     id      the ID of the current module
-             * @return {Boolean}            returns true if module needs dependencies else false.
+             * @param  {string}     id      the ID of the current module
+             * @return {boolean}            returns true if module needs dependencies else false.
              */
             function getDependencies(deps, id) {
                 var needed = [],
@@ -1233,10 +1299,10 @@
             }
             /**
              * Will register the module as loaded, will also trigger core.amd.module.loaded
-             * @param  {String}     id
+             * @param  {string}     id
              * @param  {Array}      deps
              * @param  {Function}   factory
-             * @param  {Number}     conf
+             * @param  {number}     conf
              * @param  {*}          scope
              */
             function registerModule(id, deps, factory, conf, scope) {
@@ -1270,7 +1336,7 @@
              * Load module
              * @param  {Array}      deps        a array of dependencies
              * @param  {Function}   factory     the module factory
-             * @param  {Number}     conf        module configuration bit
+             * @param  {number}     conf        module configuration bit
              * @param  {*}          scope       module scope
              * @return {Objec}                  the result of the factory
              */
@@ -1318,9 +1384,9 @@
                     REFACTOR: REFACTOR,
                     /**
                      * AMD define
-                     * @param {string|Array|function}   id
-                     * @param {Array|function}          deps
-                     * @param {function}                factory
+                     * @param {string|Array|Function}   id
+                     * @param {Array|Function}          deps
+                     * @param {Function}                factory
                      * @param {number}                  flags
                      * @param {*}                       scope
                      */
@@ -1381,13 +1447,13 @@
                 var coreApi = {
                     /**
                      * Current vp.js version
-                     * @type {Number}
+                     * @type {number}
                      * @constant
                      */
                     VERSION: VERSION,
                     /**
                      * Current vp.js GIT version
-                     * @type {Number}
+                     * @type {number}
                      * @constant
                      */
                     GIT_VERSION: GIT_VERSION,
@@ -1408,7 +1474,7 @@
                     unsub: unsubscribe,
                     /**
                      * Get global configuration value
-                     * @param  {String} key
+                     * @param  {string} key
                      * @return {*}          will return null if they key was not found
                      */
                     get: function (key) {
@@ -1419,9 +1485,9 @@
                     },
                     /**
                      * Set global configuration value
-                     * @param {String}  key
+                     * @param {string}  key
                      * @param {Object}  value
-                     * @param {Number}  [opt=0] set configuration flags ( bitwise )
+                     * @param {number}  [opt=0] set configuration flags ( bitwise )
                      *                          1= for merge old and new value @see $/v.merge
                      *                          2= for protecting the value from getting overwritten
                      * @return {$/core}
@@ -1448,10 +1514,10 @@
                 };
                 /**
                  * Creates main vp.js interface
-                 * @param {(string|Array|function)} p1
-                 * @param {(object|Array|function)} p2
-                 * @param {(object|function)}       p3
-                 * @param {(number|*)}              p4
+                 * @param {string|Array|Function} [p1]
+                 * @param {Object|Array|Function} [p2]
+                 * @param {Object|Function}       [p3]
+                 * @param {number|*}              [p4]
                  */
                 return VPv.merge(function (p1, p2, p3, p4) {
                     var prefix = /^(<|>)(.*)/.exec(p1);
@@ -1527,7 +1593,7 @@
             def = AMD().def;
             /**
              * AMD module loading via define
-             * @param  {String|Array|Function}  id
+             * @param  {string|Array|Function}  id
              * @param  {Array|Function}         deps
              * @param  {Function}               factory
              * @global
@@ -1556,9 +1622,9 @@
          * @example
          * //Function
          * vp(function(){}); //{@link $/amd~def}
-         * @param  {string|Array|function}  p1
-         * @param  {Object|Array|function}  [p2]
-         * @param  {Object|function}        [p3]
+         * @param  {string|Array|Function}  [p1]
+         * @param  {Object|Array|Function}  [p2]
+         * @param  {Object|Function}        [p3]
          * @param  {number|*}               [p4]
          * @name vp
          * @method
